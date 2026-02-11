@@ -1,6 +1,6 @@
 ---
 read_when: Connecting the macOS app to a remote gateway over SSH
-summary: OpenClaw.app 连接远程 Gateway 网关的 SSH 隧道设置
+summary: ClawX.app 连接远程 Gateway 网关的 SSH 隧道设置
 title: 远程 Gateway 网关设置
 x-i18n:
   generated_at: "2026-02-03T07:48:37Z"
@@ -11,9 +11,9 @@ x-i18n:
   workflow: 15
 ---
 
-# 使用远程 Gateway 网关运行 OpenClaw.app
+# 使用远程 Gateway 网关运行 ClawX.app
 
-OpenClaw.app 使用 SSH 隧道连接到远程 Gateway 网关。本指南向你展示如何设置。
+ClawX.app 使用 SSH 隧道连接到远程 Gateway 网关。本指南向你展示如何设置。
 
 ## 概述
 
@@ -21,7 +21,7 @@ OpenClaw.app 使用 SSH 隧道连接到远程 Gateway 网关。本指南向你�
 ┌─────────────────────────────────────────────────────────────┐
 │                        Client Machine                          │
 │                                                              │
-│  OpenClaw.app ──► ws://127.0.0.1:18789 (local port)           │
+│  ClawX.app ──► ws://127.0.0.1:19789 (local port)           │
 │                     │                                        │
 │                     ▼                                        │
 │  SSH Tunnel ────────────────────────────────────────────────│
@@ -32,7 +32,7 @@ OpenClaw.app 使用 SSH 隧道连接到远程 Gateway 网关。本指南向你�
 ┌─────────────────────────────────────────────────────────────┐
 │                         Remote Machine                        │
 │                                                              │
-│  Gateway WebSocket ──► ws://127.0.0.1:18789 ──►              │
+│  Gateway WebSocket ──► ws://127.0.0.1:19789 ──►              │
 │                                                              │
 └─────────────────────────────────────────────────────────────┘
 ```
@@ -47,7 +47,7 @@ OpenClaw.app 使用 SSH 隧道连接到远程 Gateway 网关。本指南向你�
 Host remote-gateway
     HostName <REMOTE_IP>          # e.g., 172.27.187.184
     User <REMOTE_USER>            # e.g., jefferson
-    LocalForward 18789 127.0.0.1:18789
+    LocalForward 19789 127.0.0.1:19789
     IdentityFile ~/.ssh/id_rsa
 ```
 
@@ -64,7 +64,7 @@ ssh-copy-id -i ~/.ssh/id_rsa <REMOTE_USER>@<REMOTE_IP>
 ### 步骤 3：设置 Gateway 网关令牌
 
 ```bash
-launchctl setenv OPENCLAW_GATEWAY_TOKEN "<your-token>"
+launchctl setenv CLAWX_GATEWAY_TOKEN "<your-token>"
 ```
 
 ### 步骤 4：启动 SSH 隧道
@@ -73,11 +73,11 @@ launchctl setenv OPENCLAW_GATEWAY_TOKEN "<your-token>"
 ssh -N remote-gateway &
 ```
 
-### 步骤 5：重启 OpenClaw.app
+### 步骤 5：重启 ClawX.app
 
 ```bash
-# Quit OpenClaw.app (⌘Q), then reopen:
-open /path/to/OpenClaw.app
+# Quit ClawX.app (⌘Q), then reopen:
+open /path/to/ClawX.app
 ```
 
 应用现在将通过 SSH 隧道连接到远程 Gateway 网关。
@@ -125,7 +125,7 @@ launchctl bootstrap gui/$UID ~/Library/LaunchAgents/bot.molt.ssh-tunnel.plist
 - 崩溃时重新启动
 - 在后台持续运行
 
-旧版注意事项：如果存在任何遗留的 `com.openclaw.ssh-tunnel` LaunchAgent，请将其删除。
+旧版注意事项：如果存在任何遗留的 `com.clawx.ssh-tunnel` LaunchAgent，请将其删除。
 
 ---
 
@@ -135,7 +135,7 @@ launchctl bootstrap gui/$UID ~/Library/LaunchAgents/bot.molt.ssh-tunnel.plist
 
 ```bash
 ps aux | grep "ssh -N remote-gateway" | grep -v grep
-lsof -i :18789
+lsof -i :19789
 ```
 
 **重启隧道：**
@@ -156,9 +156,9 @@ launchctl bootout gui/$UID/bot.molt.ssh-tunnel
 
 | 组件                                 | 功能                                  |
 | ------------------------------------ | ------------------------------------- |
-| `LocalForward 18789 127.0.0.1:18789` | 将本地端口 18789 转发到远程端口 18789 |
+| `LocalForward 19789 127.0.0.1:19789` | 将本地端口 19789 转发到远程端口 19789 |
 | `ssh -N`                             | SSH 不执行远程命令（仅端口转发）      |
 | `KeepAlive`                          | 隧道崩溃时自动重启                    |
 | `RunAtLoad`                          | 代理加载时启动隧道                    |
 
-OpenClaw.app 连接到你的客户端机器上的 `ws://127.0.0.1:18789`。SSH 隧道将该连接转发到运行 Gateway 网关的远程机器的端口 18789。
+ClawX.app 连接到你的客户端机器上的 `ws://127.0.0.1:19789`。SSH 隧道将该连接转发到运行 Gateway 网关的远程机器的端口 19789。

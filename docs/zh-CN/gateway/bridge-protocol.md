@@ -20,7 +20,7 @@ Bridge 协议是一个**旧版**节点传输（TCP JSONL）。新的节点客户
 
 如果你正在构建操作者或节点客户端，请使用 [Gateway 网关协议](/gateway/protocol)。
 
-**注意：** 当前的 OpenClaw 构建不再包含 TCP bridge 监听器；本文档仅作历史参考保留。
+**注意：** 当前的 ClawX 构建不再包含 TCP bridge 监听器；本文档仅作历史参考保留。
 旧版 `bridge.*` 配置键不再是配置模式的一部分。
 
 ## 为什么我们有两种协议
@@ -34,7 +34,7 @@ Bridge 协议是一个**旧版**节点传输（TCP JSONL）。新的节点客户
 
 - TCP，每行一个 JSON 对象（JSONL）。
 - 可选 TLS（当 `bridge.tls.enabled` 为 true 时）。
-- 旧版默认监听端口为 `18790`（当前构建不启动 TCP bridge）。
+- 旧版默认监听端口为 `19790`（当前构建不启动 TCP bridge）。
 
 当 TLS 启用时，设备发现 TXT 记录包含 `bridgeTls=1` 加上 `bridgeTlsSha256`，以便节点可以固定证书。
 
@@ -77,7 +77,7 @@ Payload 字段（除非注明，否则都是可选的）：
 
 ## Tailnet 使用
 
-- 将 bridge 绑定到 tailnet IP：在 `~/.openclaw/openclaw.json` 中设置 `bridge.bind: "tailnet"`。
+- 将 bridge 绑定到 tailnet IP：在 `~/.clawx/clawx.json` 中设置 `bridge.bind: "tailnet"`。
 - 客户端通过 MagicDNS 名称或 tailnet IP 连接。
 - Bonjour **不**跨网络；需要时使用手动主机/端口或广域 DNS‑SD。
 

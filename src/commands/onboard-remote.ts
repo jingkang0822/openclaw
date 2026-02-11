@@ -1,11 +1,11 @@
-import type { OpenClawConfig } from "../config/config.js";
+import type { ClawXConfig } from "../config/config.js";
 import type { GatewayBonjourBeacon } from "../infra/bonjour-discovery.js";
 import type { WizardPrompter } from "../wizard/prompts.js";
 import { discoverGatewayBeacons } from "../infra/bonjour-discovery.js";
 import { resolveWideAreaDiscoveryDomain } from "../infra/widearea-dns.js";
 import { detectBinary } from "./onboard-helpers.js";
 
-const DEFAULT_GATEWAY_URL = "ws://127.0.0.1:18789";
+const DEFAULT_GATEWAY_URL = "ws://127.0.0.1:19789";
 
 function pickHost(beacon: GatewayBonjourBeacon): string | undefined {
   return beacon.tailnetDns || beacon.lanHost || beacon.host;
@@ -13,7 +13,7 @@ function pickHost(beacon: GatewayBonjourBeacon): string | undefined {
 
 function buildLabel(beacon: GatewayBonjourBeacon): string {
   const host = pickHost(beacon);
-  const port = beacon.gatewayPort ?? beacon.port ?? 18789;
+  const port = beacon.gatewayPort ?? beacon.port ?? 19789;
   const title = beacon.displayName ?? beacon.instanceName;
   const hint = host ? `${host}:${port}` : "host unknown";
   return `${title} (${hint})`;
@@ -28,9 +28,9 @@ function ensureWsUrl(value: string): string {
 }
 
 export async function promptRemoteGatewayConfig(
-  cfg: OpenClawConfig,
+  cfg: ClawXConfig,
   prompter: WizardPrompter,
-): Promise<OpenClawConfig> {
+): Promise<ClawXConfig> {
   let selectedBeacon: GatewayBonjourBeacon | null = null;
   let suggestedUrl = cfg.gateway?.remote?.url ?? DEFAULT_GATEWAY_URL;
 
@@ -46,7 +46,7 @@ export async function promptRemoteGatewayConfig(
     await prompter.note(
       [
         "Bonjour discovery requires dns-sd (macOS) or avahi-browse (Linux).",
-        "Docs: https://docs.openclaw.ai/gateway/discovery",
+        "Docs: https://docs.clawx.ai/gateway/discovery",
       ].join("\n"),
       "Discovery",
     );
@@ -80,7 +80,7 @@ export async function promptRemoteGatewayConfig(
 
   if (selectedBeacon) {
     const host = pickHost(selectedBeacon);
-    const port = selectedBeacon.gatewayPort ?? 18789;
+    const port = selectedBeacon.gatewayPort ?? 19789;
     if (host) {
       const mode = await prompter.select({
         message: "Connection method",
@@ -99,10 +99,10 @@ export async function promptRemoteGatewayConfig(
         await prompter.note(
           [
             "Start a tunnel before using the CLI:",
-            `ssh -N -L 18789:127.0.0.1:18789 <user>@${host}${
+            `ssh -N -L 19789:127.0.0.1:19789 <user>@${host}${
               selectedBeacon.sshPort ? ` -p ${selectedBeacon.sshPort}` : ""
             }`,
-            "Docs: https://docs.openclaw.ai/gateway/remote",
+            "Docs: https://docs.clawx.ai/gateway/remote",
           ].join("\n"),
           "SSH tunnel",
         );

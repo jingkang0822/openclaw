@@ -47,8 +47,8 @@ function parseLsofFieldOutput(output: string): PortListener[] {
     } else if (line.startsWith("c")) {
       current.command = line.slice(1);
     } else if (line.startsWith("n")) {
-      // TCP 127.0.0.1:18789 (LISTEN)
-      // TCP *:18789 (LISTEN)
+      // TCP 127.0.0.1:19789 (LISTEN)
+      // TCP *:19789 (LISTEN)
       if (!current.address) {
         current.address = line.slice(1);
       }

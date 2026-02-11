@@ -1,5 +1,5 @@
 ---
-summary: "Run multiple OpenClaw Gateways on one host (isolation, ports, and profiles)"
+summary: "Run multiple ClawX Gateways on one host (isolation, ports, and profiles)"
 read_when:
   - Running more than one Gateway on the same machine
   - You need isolated config/state/ports per Gateway
@@ -12,8 +12,8 @@ Most setups should use one Gateway because a single Gateway can handle multiple 
 
 ## Isolation checklist (required)
 
-- `OPENCLAW_CONFIG_PATH` — per-instance config file
-- `OPENCLAW_STATE_DIR` — per-instance sessions, creds, caches
+- `CLAWX_CONFIG_PATH` — per-instance config file
+- `CLAWX_STATE_DIR` — per-instance sessions, creds, caches
 - `agents.defaults.workspace` — per-instance workspace root
 - `gateway.port` (or `--port`) — unique per instance
 - Derived ports (browser/canvas) must not overlap
@@ -22,23 +22,23 @@ If these are shared, you will hit config races and port conflicts.
 
 ## Recommended: profiles (`--profile`)
 
-Profiles auto-scope `OPENCLAW_STATE_DIR` + `OPENCLAW_CONFIG_PATH` and suffix service names.
+Profiles auto-scope `CLAWX_STATE_DIR` + `CLAWX_CONFIG_PATH` and suffix service names.
 
 ```bash
 # main
-openclaw --profile main setup
-openclaw --profile main gateway --port 18789
+clawx --profile main setup
+clawx --profile main gateway --port 19789
 
 # rescue
-openclaw --profile rescue setup
-openclaw --profile rescue gateway --port 19001
+clawx --profile rescue setup
+clawx --profile rescue gateway --port 19001
 ```
 
 Per-profile services:
 
 ```bash
-openclaw --profile main gateway install
-openclaw --profile rescue gateway install
+clawx --profile main gateway install
+clawx --profile rescue gateway install
 ```
 
 ## Rescue-bot guide
@@ -58,25 +58,25 @@ Port spacing: leave at least 20 ports between base ports so the derived browser/
 
 ```bash
 # Main bot (existing or fresh, without --profile param)
-# Runs on port 18789 + Chrome CDC/Canvas/... Ports
-openclaw onboard
-openclaw gateway install
+# Runs on port 19789 + Chrome CDC/Canvas/... Ports
+clawx onboard
+clawx gateway install
 
 # Rescue bot (isolated profile + ports)
-openclaw --profile rescue onboard
+clawx --profile rescue onboard
 # Notes:
 # - workspace name will be postfixed with -rescue per default
-# - Port should be at least 18789 + 20 Ports,
+# - Port should be at least 19789 + 20 Ports,
 #   better choose completely different base port, like 19789,
 # - rest of the onboarding is the same as normal
 
 # To install the service (if not happened automatically during onboarding)
-openclaw --profile rescue gateway install
+clawx --profile rescue gateway install
 ```
 
 ## Port mapping (derived)
 
-Base port = `gateway.port` (or `OPENCLAW_GATEWAY_PORT` / `--port`).
+Base port = `gateway.port` (or `CLAWX_GATEWAY_PORT` / `--port`).
 
 - browser control service port = base + 2 (loopback only)
 - `canvasHost.port = base + 4`
@@ -94,19 +94,19 @@ If you override any of these in config or env, you must keep them unique per ins
 ## Manual env example
 
 ```bash
-OPENCLAW_CONFIG_PATH=~/.openclaw/main.json \
-OPENCLAW_STATE_DIR=~/.openclaw-main \
-openclaw gateway --port 18789
+CLAWX_CONFIG_PATH=~/.clawx/main.json \
+CLAWX_STATE_DIR=~/.clawx-main \
+clawx gateway --port 19789
 
-OPENCLAW_CONFIG_PATH=~/.openclaw/rescue.json \
-OPENCLAW_STATE_DIR=~/.openclaw-rescue \
-openclaw gateway --port 19001
+CLAWX_CONFIG_PATH=~/.clawx/rescue.json \
+CLAWX_STATE_DIR=~/.clawx-rescue \
+clawx gateway --port 19001
 ```
 
 ## Quick checks
 
 ```bash
-openclaw --profile main status
-openclaw --profile rescue status
-openclaw --profile rescue browser status
+clawx --profile main status
+clawx --profile rescue status
+clawx --profile rescue browser status
 ```

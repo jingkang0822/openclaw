@@ -247,7 +247,8 @@ export function createAgentEventHandler({
       },
     };
     // Suppress webchat broadcast for heartbeat runs when showOk is false
-    if (!shouldSuppressHeartbeatBroadcast(clientRunId)) {
+    const suppressed = shouldSuppressHeartbeatBroadcast(clientRunId);
+    if (!suppressed) {
       broadcast("chat", payload, { dropIfSlow: true });
     }
     nodeSendToSession(sessionKey, "chat", payload);
@@ -278,7 +279,8 @@ export function createAgentEventHandler({
           : undefined,
       };
       // Suppress webchat broadcast for heartbeat runs when showOk is false
-      if (!shouldSuppressHeartbeatBroadcast(clientRunId)) {
+      const suppressed = shouldSuppressHeartbeatBroadcast(clientRunId);
+      if (!suppressed) {
         broadcast("chat", payload);
       }
       nodeSendToSession(sessionKey, "chat", payload);

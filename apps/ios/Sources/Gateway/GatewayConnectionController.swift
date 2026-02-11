@@ -1,4 +1,4 @@
-import OpenClawKit
+import ClawXKit
 import Darwin
 import Foundation
 import Network
@@ -53,7 +53,7 @@ final class GatewayConnectionController {
         let token = GatewaySettingsStore.loadGatewayToken(instanceId: instanceId)
         let password = GatewaySettingsStore.loadGatewayPassword(instanceId: instanceId)
         guard let host = self.resolveGatewayHost(gateway) else { return }
-        let port = gateway.gatewayPort ?? 18789
+        let port = gateway.gatewayPort ?? 19789
         let tlsParams = self.resolveDiscoveredTLSParams(gateway: gateway)
         guard let url = self.buildGatewayURL(
             host: host,
@@ -134,7 +134,7 @@ final class GatewayConnectionController {
             guard !manualHost.isEmpty else { return }
 
             let manualPort = defaults.integer(forKey: "gateway.manual.port")
-            let resolvedPort = manualPort > 0 ? manualPort : 18789
+            let resolvedPort = manualPort > 0 ? manualPort : 19789
             let manualTLS = defaults.bool(forKey: "gateway.manual.tls")
 
             let stableID = self.manualStableID(host: manualHost, port: resolvedPort)
@@ -168,7 +168,7 @@ final class GatewayConnectionController {
 
         guard let target = self.gateways.first(where: { $0.stableID == targetStableID }) else { return }
         guard let host = self.resolveGatewayHost(target) else { return }
-        let port = target.gatewayPort ?? 18789
+        let port = target.gatewayPort ?? 19789
         let tlsParams = self.resolveDiscoveredTLSParams(gateway: target)
         guard let url = self.buildGatewayURL(host: host, port: port, useTLS: tlsParams?.required == true)
         else { return }
@@ -283,7 +283,7 @@ final class GatewayConnectionController {
             caps: self.currentCaps(),
             commands: self.currentCommands(),
             permissions: [:],
-            clientId: "openclaw-ios",
+            clientId: "clawx-ios",
             clientMode: "node",
             clientDisplayName: displayName)
     }
@@ -304,51 +304,51 @@ final class GatewayConnectionController {
     }
 
     private func currentCaps() -> [String] {
-        var caps = [OpenClawCapability.canvas.rawValue, OpenClawCapability.screen.rawValue]
+        var caps = [ClawXCapability.canvas.rawValue, ClawXCapability.screen.rawValue]
 
         // Default-on: if the key doesn't exist yet, treat it as enabled.
         let cameraEnabled =
             UserDefaults.standard.object(forKey: "camera.enabled") == nil
                 ? true
                 : UserDefaults.standard.bool(forKey: "camera.enabled")
-        if cameraEnabled { caps.append(OpenClawCapability.camera.rawValue) }
+        if cameraEnabled { caps.append(ClawXCapability.camera.rawValue) }
 
         let voiceWakeEnabled = UserDefaults.standard.bool(forKey: VoiceWakePreferences.enabledKey)
-        if voiceWakeEnabled { caps.append(OpenClawCapability.voiceWake.rawValue) }
+        if voiceWakeEnabled { caps.append(ClawXCapability.voiceWake.rawValue) }
 
         let locationModeRaw = UserDefaults.standard.string(forKey: "location.enabledMode") ?? "off"
-        let locationMode = OpenClawLocationMode(rawValue: locationModeRaw) ?? .off
-        if locationMode != .off { caps.append(OpenClawCapability.location.rawValue) }
+        let locationMode = ClawXLocationMode(rawValue: locationModeRaw) ?? .off
+        if locationMode != .off { caps.append(ClawXCapability.location.rawValue) }
 
         return caps
     }
 
     private func currentCommands() -> [String] {
         var commands: [String] = [
-            OpenClawCanvasCommand.present.rawValue,
-            OpenClawCanvasCommand.hide.rawValue,
-            OpenClawCanvasCommand.navigate.rawValue,
-            OpenClawCanvasCommand.evalJS.rawValue,
-            OpenClawCanvasCommand.snapshot.rawValue,
-            OpenClawCanvasA2UICommand.push.rawValue,
-            OpenClawCanvasA2UICommand.pushJSONL.rawValue,
-            OpenClawCanvasA2UICommand.reset.rawValue,
-            OpenClawScreenCommand.record.rawValue,
-            OpenClawSystemCommand.notify.rawValue,
-            OpenClawSystemCommand.which.rawValue,
-            OpenClawSystemCommand.run.rawValue,
-            OpenClawSystemCommand.execApprovalsGet.rawValue,
-            OpenClawSystemCommand.execApprovalsSet.rawValue,
+            ClawXCanvasCommand.present.rawValue,
+            ClawXCanvasCommand.hide.rawValue,
+            ClawXCanvasCommand.navigate.rawValue,
+            ClawXCanvasCommand.evalJS.rawValue,
+            ClawXCanvasCommand.snapshot.rawValue,
+            ClawXCanvasA2UICommand.push.rawValue,
+            ClawXCanvasA2UICommand.pushJSONL.rawValue,
+            ClawXCanvasA2UICommand.reset.rawValue,
+            ClawXScreenCommand.record.rawValue,
+            ClawXSystemCommand.notify.rawValue,
+            ClawXSystemCommand.which.rawValue,
+            ClawXSystemCommand.run.rawValue,
+            ClawXSystemCommand.execApprovalsGet.rawValue,
+            ClawXSystemCommand.execApprovalsSet.rawValue,
         ]
 
         let caps = Set(self.currentCaps())
-        if caps.contains(OpenClawCapability.camera.rawValue) {
-            commands.append(OpenClawCameraCommand.list.rawValue)
-            commands.append(OpenClawCameraCommand.snap.rawValue)
-            commands.append(OpenClawCameraCommand.clip.rawValue)
+        if caps.contains(ClawXCapability.camera.rawValue) {
+            commands.append(ClawXCameraCommand.list.rawValue)
+            commands.append(ClawXCameraCommand.snap.rawValue)
+            commands.append(ClawXCameraCommand.clip.rawValue)
         }
-        if caps.contains(OpenClawCapability.location.rawValue) {
-            commands.append(OpenClawLocationCommand.get.rawValue)
+        if caps.contains(ClawXCapability.location.rawValue) {
+            commands.append(ClawXLocationCommand.get.rawValue)
         }
 
         return commands

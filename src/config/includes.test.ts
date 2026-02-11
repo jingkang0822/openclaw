@@ -9,17 +9,17 @@ import {
 
 const ROOT_DIR = path.parse(process.cwd()).root;
 const CONFIG_DIR = path.join(ROOT_DIR, "config");
-const ETC_OPENCLAW_DIR = path.join(ROOT_DIR, "etc", "openclaw");
+const ETC_CLAWX_DIR = path.join(ROOT_DIR, "etc", "clawx");
 const SHARED_DIR = path.join(ROOT_DIR, "shared");
 
-const DEFAULT_BASE_PATH = path.join(CONFIG_DIR, "openclaw.json");
+const DEFAULT_BASE_PATH = path.join(CONFIG_DIR, "clawx.json");
 
 function configPath(...parts: string[]) {
   return path.join(CONFIG_DIR, ...parts);
 }
 
-function etcOpenClawPath(...parts: string[]) {
-  return path.join(ETC_OPENCLAW_DIR, ...parts);
+function etcClawXPath(...parts: string[]) {
+  return path.join(ETC_CLAWX_DIR, ...parts);
 }
 
 function sharedPath(...parts: string[]) {
@@ -68,7 +68,7 @@ describe("resolveConfigIncludes", () => {
   });
 
   it("resolves absolute path $include", () => {
-    const absolute = etcOpenClawPath("agents.json");
+    const absolute = etcClawXPath("agents.json");
     const files = { [absolute]: { list: [{ id: "main" }] } };
     const obj = { agents: { $include: absolute } };
     expect(resolve(obj, files)).toEqual({
@@ -281,7 +281,7 @@ describe("resolveConfigIncludes", () => {
   it("resolves parent directory references", () => {
     const files = { [sharedPath("common.json")]: { shared: true } };
     const obj = { $include: "../../shared/common.json" };
-    expect(resolve(obj, files, configPath("sub", "openclaw.json"))).toEqual({
+    expect(resolve(obj, files, configPath("sub", "clawx.json"))).toEqual({
       shared: true,
     });
   });
@@ -317,12 +317,12 @@ describe("real-world config patterns", () => {
     };
 
     const obj = {
-      gateway: { port: 18789 },
+      gateway: { port: 19789 },
       $include: ["./clients/mueller.json", "./clients/schmidt.json"],
     };
 
     expect(resolve(obj, files)).toEqual({
-      gateway: { port: 18789 },
+      gateway: { port: 19789 },
       agents: [
         { id: "mueller-screenshot", workspace: "~/clients/mueller/screenshot" },
         { id: "mueller-transcribe", workspace: "~/clients/mueller/transcribe" },
@@ -338,7 +338,7 @@ describe("real-world config patterns", () => {
   it("supports modular config structure", () => {
     const files = {
       [configPath("gateway.json")]: {
-        gateway: { port: 18789, bind: "loopback" },
+        gateway: { port: 19789, bind: "loopback" },
       },
       [configPath("channels", "whatsapp.json")]: {
         channels: { whatsapp: { dmPolicy: "pairing", allowFrom: ["+49123"] } },
@@ -353,7 +353,7 @@ describe("real-world config patterns", () => {
     };
 
     expect(resolve(obj, files)).toEqual({
-      gateway: { port: 18789, bind: "loopback" },
+      gateway: { port: 19789, bind: "loopback" },
       channels: { whatsapp: { dmPolicy: "pairing", allowFrom: ["+49123"] } },
       agents: { defaults: { sandbox: { mode: "all" } } },
     });

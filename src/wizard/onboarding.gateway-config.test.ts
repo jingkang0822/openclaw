@@ -25,7 +25,7 @@ describe("configureGatewayForOnboarding", () => {
     mocks.randomToken.mockReturnValue("generated-token");
 
     const selectQueue = ["loopback", "token", "off"];
-    const textQueue = ["18789", undefined];
+    const textQueue = ["19789", undefined];
     const prompter: WizardPrompter = {
       intro: vi.fn(async () => {}),
       outro: vi.fn(async () => {}),
@@ -47,10 +47,10 @@ describe("configureGatewayForOnboarding", () => {
       flow: "advanced",
       baseConfig: {},
       nextConfig: {},
-      localPort: 18789,
+      localPort: 19789,
       quickstartGateway: {
         hasExisting: false,
-        port: 18789,
+        port: 19789,
         bind: "loopback",
         authMode: "token",
         tailscaleMode: "off",

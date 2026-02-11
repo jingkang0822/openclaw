@@ -1,12 +1,12 @@
 ---
-summary: "SSH tunnel setup for OpenClaw.app connecting to a remote gateway"
+summary: "SSH tunnel setup for ClawX.app connecting to a remote gateway"
 read_when: "Connecting the macOS app to a remote gateway over SSH"
 title: "Remote Gateway Setup"
 ---
 
-# Running OpenClaw.app with a Remote Gateway
+# Running ClawX.app with a Remote Gateway
 
-OpenClaw.app uses SSH tunneling to connect to a remote gateway. This guide shows you how to set it up.
+ClawX.app uses SSH tunneling to connect to a remote gateway. This guide shows you how to set it up.
 
 ## Overview
 
@@ -14,7 +14,7 @@ OpenClaw.app uses SSH tunneling to connect to a remote gateway. This guide shows
 ┌─────────────────────────────────────────────────────────────┐
 │                        Client Machine                          │
 │                                                              │
-│  OpenClaw.app ──► ws://127.0.0.1:18789 (local port)           │
+│  ClawX.app ──► ws://127.0.0.1:19789 (local port)           │
 │                     │                                        │
 │                     ▼                                        │
 │  SSH Tunnel ────────────────────────────────────────────────│
@@ -25,7 +25,7 @@ OpenClaw.app uses SSH tunneling to connect to a remote gateway. This guide shows
 ┌─────────────────────────────────────────────────────────────┐
 │                         Remote Machine                        │
 │                                                              │
-│  Gateway WebSocket ──► ws://127.0.0.1:18789 ──►              │
+│  Gateway WebSocket ──► ws://127.0.0.1:19789 ──►              │
 │                                                              │
 └─────────────────────────────────────────────────────────────┘
 ```
@@ -40,7 +40,7 @@ Edit `~/.ssh/config` and add:
 Host remote-gateway
     HostName <REMOTE_IP>          # e.g., 172.27.187.184
     User <REMOTE_USER>            # e.g., jefferson
-    LocalForward 18789 127.0.0.1:18789
+    LocalForward 19789 127.0.0.1:19789
     IdentityFile ~/.ssh/id_rsa
 ```
 
@@ -57,7 +57,7 @@ ssh-copy-id -i ~/.ssh/id_rsa <REMOTE_USER>@<REMOTE_IP>
 ### Step 3: Set Gateway Token
 
 ```bash
-launchctl setenv OPENCLAW_GATEWAY_TOKEN "<your-token>"
+launchctl setenv CLAWX_GATEWAY_TOKEN "<your-token>"
 ```
 
 ### Step 4: Start SSH Tunnel
@@ -66,11 +66,11 @@ launchctl setenv OPENCLAW_GATEWAY_TOKEN "<your-token>"
 ssh -N remote-gateway &
 ```
 
-### Step 5: Restart OpenClaw.app
+### Step 5: Restart ClawX.app
 
 ```bash
-# Quit OpenClaw.app (⌘Q), then reopen:
-open /path/to/OpenClaw.app
+# Quit ClawX.app (⌘Q), then reopen:
+open /path/to/ClawX.app
 ```
 
 The app will now connect to the remote gateway through the SSH tunnel.
@@ -118,7 +118,7 @@ The tunnel will now:
 - Restart if it crashes
 - Keep running in the background
 
-Legacy note: remove any leftover `com.openclaw.ssh-tunnel` LaunchAgent if present.
+Legacy note: remove any leftover `com.clawx.ssh-tunnel` LaunchAgent if present.
 
 ---
 
@@ -128,7 +128,7 @@ Legacy note: remove any leftover `com.openclaw.ssh-tunnel` LaunchAgent if presen
 
 ```bash
 ps aux | grep "ssh -N remote-gateway" | grep -v grep
-lsof -i :18789
+lsof -i :19789
 ```
 
 **Restart the tunnel:**
@@ -149,9 +149,9 @@ launchctl bootout gui/$UID/bot.molt.ssh-tunnel
 
 | Component                            | What It Does                                                 |
 | ------------------------------------ | ------------------------------------------------------------ |
-| `LocalForward 18789 127.0.0.1:18789` | Forwards local port 18789 to remote port 18789               |
+| `LocalForward 19789 127.0.0.1:19789` | Forwards local port 19789 to remote port 19789               |
 | `ssh -N`                             | SSH without executing remote commands (just port forwarding) |
 | `KeepAlive`                          | Automatically restarts tunnel if it crashes                  |
 | `RunAtLoad`                          | Starts tunnel when the agent loads                           |
 
-OpenClaw.app connects to `ws://127.0.0.1:18789` on your client machine. The SSH tunnel forwards that connection to port 18789 on the remote machine where the Gateway is running.
+ClawX.app connects to `ws://127.0.0.1:19789` on your client machine. The SSH tunnel forwards that connection to port 19789 on the remote machine where the Gateway is running.

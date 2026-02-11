@@ -1,6 +1,6 @@
 import Testing
 import WebKit
-@testable import OpenClaw
+@testable import ClawX
 
 @Suite struct ScreenControllerTests {
     @Test @MainActor func canvasModeConfiguresWebViewForTouch() {
@@ -52,13 +52,13 @@ import WebKit
 
     @Test @MainActor func localNetworkCanvasURLsAreAllowed() {
         let screen = ScreenController()
-        #expect(screen.isLocalNetworkCanvasURL(URL(string: "http://localhost:18789/")!) == true)
-        #expect(screen.isLocalNetworkCanvasURL(URL(string: "http://openclaw.local:18789/")!) == true)
-        #expect(screen.isLocalNetworkCanvasURL(URL(string: "http://peters-mac-studio-1:18789/")!) == true)
-        #expect(screen.isLocalNetworkCanvasURL(URL(string: "https://peters-mac-studio-1.ts.net:18789/")!) == true)
-        #expect(screen.isLocalNetworkCanvasURL(URL(string: "http://192.168.0.10:18789/")!) == true)
-        #expect(screen.isLocalNetworkCanvasURL(URL(string: "http://10.0.0.10:18789/")!) == true)
-        #expect(screen.isLocalNetworkCanvasURL(URL(string: "http://100.123.224.76:18789/")!) == true) // Tailscale CGNAT
+        #expect(screen.isLocalNetworkCanvasURL(URL(string: "http://localhost:19789/")!) == true)
+        #expect(screen.isLocalNetworkCanvasURL(URL(string: "http://clawx.local:19789/")!) == true)
+        #expect(screen.isLocalNetworkCanvasURL(URL(string: "http://peters-mac-studio-1:19789/")!) == true)
+        #expect(screen.isLocalNetworkCanvasURL(URL(string: "https://peters-mac-studio-1.ts.net:19789/")!) == true)
+        #expect(screen.isLocalNetworkCanvasURL(URL(string: "http://192.168.0.10:19789/")!) == true)
+        #expect(screen.isLocalNetworkCanvasURL(URL(string: "http://10.0.0.10:19789/")!) == true)
+        #expect(screen.isLocalNetworkCanvasURL(URL(string: "http://100.123.224.76:19789/")!) == true) // Tailscale CGNAT
         #expect(screen.isLocalNetworkCanvasURL(URL(string: "https://example.com/")!) == false)
         #expect(screen.isLocalNetworkCanvasURL(URL(string: "http://8.8.8.8/")!) == false)
     }

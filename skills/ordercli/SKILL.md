@@ -4,7 +4,7 @@ description: Foodora-only CLI for checking past orders and active order status (
 homepage: https://ordercli.sh
 metadata:
   {
-    "openclaw":
+    "clawx":
       {
         "emoji": "🛵",
         "requires": { "bins": ["ordercli"] },

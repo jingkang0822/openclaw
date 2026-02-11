@@ -41,7 +41,12 @@ export async function loadChatHistory(state: ChatState) {
         limit: 200,
       },
     );
-    state.chatMessages = Array.isArray(res.messages) ? res.messages : [];
+    const serverMessages = Array.isArray(res.messages) ? res.messages : [];
+    // Only replace local messages with server data if server has content.
+    // CLI-backed sessions may not have a transcript file yet, returning 0 messages.
+    if (serverMessages.length > 0 || state.chatMessages.length === 0) {
+      state.chatMessages = serverMessages;
+    }
     state.chatThinkingLevel = res.thinkingLevel ?? null;
   } catch (err) {
     state.lastError = String(err);
@@ -177,7 +182,7 @@ export function handleChatEvent(state: ChatState, payload?: ChatEventPayload) {
   }
 
   // Final from another run (e.g. sub-agent announce): refresh history to show new message.
-  // See https://github.com/openclaw/openclaw/issues/1909
+  // See https://github.com/clawx/clawx/issues/1909
   if (payload.runId && state.chatRunId && payload.runId !== state.chatRunId) {
     if (payload.state === "final") {
       return "final";
@@ -194,6 +199,20 @@ export function handleChatEvent(state: ChatState, payload?: ChatEventPayload) {
       }
     }
   } else if (payload.state === "final") {
+    // Preserve the streamed text as an assistant message before clearing.
+    // For CLI-backed sessions the server transcript may not exist yet,
+    // so loadChatHistory could return empty and wipe all messages.
+    const finalText = extractText(payload.message) ?? state.chatStream;
+    if (finalText && finalText.trim()) {
+      state.chatMessages = [
+        ...state.chatMessages,
+        {
+          role: "assistant",
+          content: [{ type: "text", text: finalText }],
+          timestamp: Date.now(),
+        },
+      ];
+    }
     state.chatStream = null;
     state.chatRunId = null;
     state.chatStreamStartedAt = null;

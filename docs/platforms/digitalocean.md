@@ -1,16 +1,16 @@
 ---
-summary: "OpenClaw on DigitalOcean (simple paid VPS option)"
+summary: "ClawX on DigitalOcean (simple paid VPS option)"
 read_when:
-  - Setting up OpenClaw on DigitalOcean
-  - Looking for cheap VPS hosting for OpenClaw
+  - Setting up ClawX on DigitalOcean
+  - Looking for cheap VPS hosting for ClawX
 title: "DigitalOcean"
 ---
 
-# OpenClaw on DigitalOcean
+# ClawX on DigitalOcean
 
 ## Goal
 
-Run a persistent OpenClaw Gateway on DigitalOcean for **$6/month** (or $4/mo with reserved pricing).
+Run a persistent ClawX Gateway on DigitalOcean for **$6/month** (or $4/mo with reserved pricing).
 
 If you want a $0/month option and don’t mind ARM + provider-specific setup, see the [Oracle Cloud guide](/platforms/oracle).
 
@@ -56,7 +56,7 @@ If you want a $0/month option and don’t mind ARM + provider-specific setup, se
 ssh root@YOUR_DROPLET_IP
 ```
 
-## 3) Install OpenClaw
+## 3) Install ClawX
 
 ```bash
 # Update system
@@ -66,17 +66,17 @@ apt update && apt upgrade -y
 curl -fsSL https://deb.nodesource.com/setup_22.x | bash -
 apt install -y nodejs
 
-# Install OpenClaw
-curl -fsSL https://openclaw.ai/install.sh | bash
+# Install ClawX
+curl -fsSL https://clawx.ai/install.sh | bash
 
 # Verify
-openclaw --version
+clawx --version
 ```
 
 ## 4) Run Onboarding
 
 ```bash
-openclaw onboard --install-daemon
+clawx onboard --install-daemon
 ```
 
 The wizard will walk you through:
@@ -90,13 +90,13 @@ The wizard will walk you through:
 
 ```bash
 # Check status
-openclaw status
+clawx status
 
 # Check service
-systemctl --user status openclaw-gateway.service
+systemctl --user status clawx-gateway.service
 
 # View logs
-journalctl --user -u openclaw-gateway.service -f
+journalctl --user -u clawx-gateway.service -f
 ```
 
 ## 6) Access the Dashboard
@@ -107,9 +107,9 @@ The gateway binds to loopback by default. To access the Control UI:
 
 ```bash
 # From your local machine
-ssh -L 18789:localhost:18789 root@YOUR_DROPLET_IP
+ssh -L 19789:localhost:19789 root@YOUR_DROPLET_IP
 
-# Then open: http://localhost:18789
+# Then open: http://localhost:19789
 ```
 
 **Option B: Tailscale Serve (HTTPS, loopback-only)**
@@ -120,8 +120,8 @@ curl -fsSL https://tailscale.com/install.sh | sh
 tailscale up
 
 # Configure Gateway to use Tailscale Serve
-openclaw config set gateway.tailscale.mode serve
-openclaw gateway restart
+clawx config set gateway.tailscale.mode serve
+clawx gateway restart
 ```
 
 Open: `https://<magicdns>/`
@@ -134,25 +134,25 @@ Notes:
 **Option C: Tailnet bind (no Serve)**
 
 ```bash
-openclaw config set gateway.bind tailnet
-openclaw gateway restart
+clawx config set gateway.bind tailnet
+clawx gateway restart
 ```
 
-Open: `http://<tailscale-ip>:18789` (token required).
+Open: `http://<tailscale-ip>:19789` (token required).
 
 ## 7) Connect Your Channels
 
 ### Telegram
 
 ```bash
-openclaw pairing list telegram
-openclaw pairing approve telegram <CODE>
+clawx pairing list telegram
+clawx pairing approve telegram <CODE>
 ```
 
 ### WhatsApp
 
 ```bash
-openclaw channels login whatsapp
+clawx channels login whatsapp
 # Scan QR code
 ```
 
@@ -194,13 +194,13 @@ htop
 
 All state lives in:
 
-- `~/.openclaw/` — config, credentials, session data
-- `~/.openclaw/workspace/` — workspace (SOUL.md, memory, etc.)
+- `~/.clawx/` — config, credentials, session data
+- `~/.clawx/workspace/` — workspace (SOUL.md, memory, etc.)
 
 These survive reboots. Back them up periodically:
 
 ```bash
-tar -czvf openclaw-backup.tar.gz ~/.openclaw ~/.openclaw/workspace
+tar -czvf clawx-backup.tar.gz ~/.clawx ~/.clawx/workspace
 ```
 
 ---
@@ -230,15 +230,15 @@ For the full setup guide, see [Oracle Cloud](/platforms/oracle). For signup tips
 ### Gateway won't start
 
 ```bash
-openclaw gateway status
-openclaw doctor --non-interactive
-journalctl -u openclaw --no-pager -n 50
+clawx gateway status
+clawx doctor --non-interactive
+journalctl -u clawx --no-pager -n 50
 ```
 
 ### Port already in use
 
 ```bash
-lsof -i :18789
+lsof -i :19789
 kill <PID>
 ```
 

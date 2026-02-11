@@ -1,15 +1,15 @@
 ---
 name: soul-evil
 description: "Swap SOUL.md with SOUL_EVIL.md during a purge window or by random chance"
-homepage: https://docs.openclaw.ai/hooks/soul-evil
+homepage: https://docs.clawx.ai/hooks/soul-evil
 metadata:
   {
-    "openclaw":
+    "clawx":
       {
         "emoji": "😈",
         "events": ["agent:bootstrap"],
         "requires": { "config": ["hooks.internal.entries.soul-evil.enabled"] },
-        "install": [{ "id": "bundled", "kind": "bundled", "label": "Bundled with OpenClaw" }],
+        "install": [{ "id": "bundled", "kind": "bundled", "label": "Bundled with ClawX" }],
       },
   }
 ---
@@ -31,7 +31,7 @@ You can change the filename via hook config.
 
 ## Configuration
 
-Add this to your config (`~/.openclaw/openclaw.json`):
+Add this to your config (`~/.clawx/clawx.json`):
 
 ```json
 {
@@ -67,5 +67,5 @@ Add this to your config (`~/.openclaw/openclaw.json`):
 ## Enable
 
 ```bash
-openclaw hooks enable soul-evil
+clawx hooks enable soul-evil
 ```

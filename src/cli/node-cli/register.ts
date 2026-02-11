@@ -23,8 +23,7 @@ export function registerNodeCli(program: Command) {
     .description("Run a headless node host (system.run/system.which)")
     .addHelpText(
       "after",
-      () =>
-        `\n${theme.muted("Docs:")} ${formatDocsLink("/cli/node", "docs.openclaw.ai/cli/node")}\n`,
+      () => `\n${theme.muted("Docs:")} ${formatDocsLink("/cli/node", "docs.clawx.ai/cli/node")}\n`,
     );
 
   node
@@ -40,7 +39,7 @@ export function registerNodeCli(program: Command) {
       const existing = await loadNodeHostConfig();
       const host =
         (opts.host as string | undefined)?.trim() || existing?.gateway?.host || "127.0.0.1";
-      const port = parsePortWithFallback(opts.port, existing?.gateway?.port ?? 18789);
+      const port = parsePortWithFallback(opts.port, existing?.gateway?.port ?? 19789);
       await runNodeHost({
         gatewayHost: host,
         gatewayPort: port,

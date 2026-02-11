@@ -1,4 +1,4 @@
-import type { PluginRuntime } from "openclaw/plugin-sdk";
+import type { PluginRuntime } from "clawx/plugin-sdk";
 
 let runtime: PluginRuntime | null = null;
 

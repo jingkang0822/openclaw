@@ -1,14 +1,14 @@
 import fs from "node:fs";
 import path from "node:path";
 import { resolveStateDir } from "../config/paths.js";
-import { resolveOpenClawPackageRoot } from "./openclaw-root.js";
+import { resolveClawXPackageRoot } from "./clawx-root.js";
 
 /**
- * Sync bundled cli-scripts from the package root to ~/.openclaw/scripts/.
+ * Sync bundled cli-scripts from the package root to ~/.clawx/scripts/.
  * Called once at gateway startup so agents always find the scripts at a fixed path.
  */
 export async function syncCliScripts(): Promise<void> {
-  const packageRoot = await resolveOpenClawPackageRoot({
+  const packageRoot = await resolveClawXPackageRoot({
     cwd: process.cwd(),
     argv1: process.argv[1],
     moduleUrl: import.meta.url,

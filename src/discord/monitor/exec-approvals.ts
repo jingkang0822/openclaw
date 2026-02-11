@@ -1,6 +1,6 @@
 import { Button, type ButtonInteraction, type ComponentData } from "@buape/carbon";
 import { ButtonStyle, Routes } from "discord-api-types/v10";
-import type { OpenClawConfig } from "../../config/config.js";
+import type { ClawXConfig } from "../../config/config.js";
 import type { DiscordExecApprovalConfig } from "../../config/types.discord.js";
 import type { EventFrame } from "../../gateway/protocol/index.js";
 import type { ExecApprovalDecision } from "../../infra/exec-approvals.js";
@@ -191,7 +191,7 @@ export type DiscordExecApprovalHandlerOpts = {
   accountId: string;
   config: DiscordExecApprovalConfig;
   gatewayUrl?: string;
-  cfg: OpenClawConfig;
+  cfg: ClawXConfig;
   runtime?: RuntimeEnv;
   onResolve?: (id: string, decision: ExecApprovalDecision) => Promise<void>;
 };
@@ -267,7 +267,7 @@ export class DiscordExecApprovalHandler {
     logDebug("discord exec approvals: starting handler");
 
     this.gatewayClient = new GatewayClient({
-      url: this.opts.gatewayUrl ?? "ws://127.0.0.1:18789",
+      url: this.opts.gatewayUrl ?? "ws://127.0.0.1:19789",
       clientName: GATEWAY_CLIENT_NAMES.GATEWAY_CLIENT,
       clientDisplayName: "Discord Exec Approvals",
       mode: GATEWAY_CLIENT_MODES.BACKEND,

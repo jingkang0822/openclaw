@@ -4,7 +4,7 @@ import path from "node:path";
 import { describe, expect, it } from "vitest";
 import { applyHookMappings, resolveHookMappings } from "./hooks-mapping.js";
 
-const baseUrl = new URL("http://127.0.0.1:18789/hooks/gmail");
+const baseUrl = new URL("http://127.0.0.1:19789/hooks/gmail");
 
 describe("hooks mapping", () => {
   it("resolves gmail preset", () => {
@@ -62,7 +62,7 @@ describe("hooks mapping", () => {
   });
 
   it("runs transform module", async () => {
-    const dir = fs.mkdtempSync(path.join(os.tmpdir(), "openclaw-hooks-"));
+    const dir = fs.mkdtempSync(path.join(os.tmpdir(), "clawx-hooks-"));
     const modPath = path.join(dir, "transform.mjs");
     const placeholder = "${payload.name}";
     fs.writeFileSync(
@@ -84,7 +84,7 @@ describe("hooks mapping", () => {
     const result = await applyHookMappings(mappings, {
       payload: { name: "Ada" },
       headers: {},
-      url: new URL("http://127.0.0.1:18789/hooks/custom"),
+      url: new URL("http://127.0.0.1:19789/hooks/custom"),
       path: "custom",
     });
 
@@ -98,7 +98,7 @@ describe("hooks mapping", () => {
   });
 
   it("treats null transform as a handled skip", async () => {
-    const dir = fs.mkdtempSync(path.join(os.tmpdir(), "openclaw-hooks-skip-"));
+    const dir = fs.mkdtempSync(path.join(os.tmpdir(), "clawx-hooks-skip-"));
     const modPath = path.join(dir, "transform.mjs");
     fs.writeFileSync(modPath, "export default () => null;");
 
@@ -116,7 +116,7 @@ describe("hooks mapping", () => {
     const result = await applyHookMappings(mappings, {
       payload: {},
       headers: {},
-      url: new URL("http://127.0.0.1:18789/hooks/skip"),
+      url: new URL("http://127.0.0.1:19789/hooks/skip"),
       path: "skip",
     });
 
@@ -159,7 +159,7 @@ describe("hooks mapping", () => {
     const result = await applyHookMappings(mappings, {
       payload: {},
       headers: {},
-      url: new URL("http://127.0.0.1:18789/hooks/noop"),
+      url: new URL("http://127.0.0.1:19789/hooks/noop"),
       path: "noop",
     });
     expect(result?.ok).toBe(false);

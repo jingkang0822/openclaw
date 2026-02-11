@@ -214,7 +214,7 @@ describe("buildServiceEnvironment", () => {
   it("sets minimal PATH and gateway vars", () => {
     const env = buildServiceEnvironment({
       env: { HOME: "/home/user" },
-      port: 18789,
+      port: 19789,
       token: "secret",
     });
     expect(env.HOME).toBe("/home/user");
@@ -223,25 +223,25 @@ describe("buildServiceEnvironment", () => {
     } else {
       expect(env.PATH).toContain("/usr/bin");
     }
-    expect(env.OPENCLAW_GATEWAY_PORT).toBe("18789");
-    expect(env.OPENCLAW_GATEWAY_TOKEN).toBe("secret");
-    expect(env.OPENCLAW_SERVICE_MARKER).toBe("openclaw");
-    expect(env.OPENCLAW_SERVICE_KIND).toBe("gateway");
-    expect(typeof env.OPENCLAW_SERVICE_VERSION).toBe("string");
-    expect(env.OPENCLAW_SYSTEMD_UNIT).toBe("openclaw-gateway.service");
+    expect(env.CLAWX_GATEWAY_PORT).toBe("19789");
+    expect(env.CLAWX_GATEWAY_TOKEN).toBe("secret");
+    expect(env.CLAWX_SERVICE_MARKER).toBe("clawx");
+    expect(env.CLAWX_SERVICE_KIND).toBe("gateway");
+    expect(typeof env.CLAWX_SERVICE_VERSION).toBe("string");
+    expect(env.CLAWX_SYSTEMD_UNIT).toBe("clawx-gateway.service");
     if (process.platform === "darwin") {
-      expect(env.OPENCLAW_LAUNCHD_LABEL).toBe("ai.openclaw.gateway");
+      expect(env.CLAWX_LAUNCHD_LABEL).toBe("ai.clawx.gateway");
     }
   });
 
   it("uses profile-specific unit and label", () => {
     const env = buildServiceEnvironment({
-      env: { HOME: "/home/user", OPENCLAW_PROFILE: "work" },
-      port: 18789,
+      env: { HOME: "/home/user", CLAWX_PROFILE: "work" },
+      port: 19789,
     });
-    expect(env.OPENCLAW_SYSTEMD_UNIT).toBe("openclaw-gateway-work.service");
+    expect(env.CLAWX_SYSTEMD_UNIT).toBe("clawx-gateway-work.service");
     if (process.platform === "darwin") {
-      expect(env.OPENCLAW_LAUNCHD_LABEL).toBe("ai.openclaw.work");
+      expect(env.CLAWX_LAUNCHD_LABEL).toBe("ai.clawx.work");
     }
   });
 });

@@ -86,8 +86,8 @@ describe("gateway bonjour advertiser", () => {
     process.env.NODE_ENV = "development";
 
     vi.spyOn(os, "hostname").mockReturnValue("test-host");
-    process.env.OPENCLAW_MDNS_HOSTNAME = "test-host";
-    process.env.OPENCLAW_MDNS_HOSTNAME = "test-host";
+    process.env.CLAWX_MDNS_HOSTNAME = "test-host";
+    process.env.CLAWX_MDNS_HOSTNAME = "test-host";
 
     const destroy = vi.fn().mockResolvedValue(undefined);
     const advertise = vi.fn().mockImplementation(
@@ -110,25 +110,25 @@ describe("gateway bonjour advertiser", () => {
     });
 
     const started = await startGatewayBonjourAdvertiser({
-      gatewayPort: 18789,
+      gatewayPort: 19789,
       sshPort: 2222,
       tailnetDns: "host.tailnet.ts.net",
-      cliPath: "/opt/homebrew/bin/openclaw",
+      cliPath: "/opt/homebrew/bin/clawx",
     });
 
     expect(createService).toHaveBeenCalledTimes(1);
     const [gatewayCall] = createService.mock.calls as Array<[Record<string, unknown>]>;
-    expect(gatewayCall?.[0]?.type).toBe("openclaw-gw");
+    expect(gatewayCall?.[0]?.type).toBe("clawx-gw");
     const gatewayType = asString(gatewayCall?.[0]?.type, "");
     expect(gatewayType.length).toBeLessThanOrEqual(15);
-    expect(gatewayCall?.[0]?.port).toBe(18789);
+    expect(gatewayCall?.[0]?.port).toBe(19789);
     expect(gatewayCall?.[0]?.domain).toBe("local");
     expect(gatewayCall?.[0]?.hostname).toBe("test-host");
     expect((gatewayCall?.[0]?.txt as Record<string, string>)?.lanHost).toBe("test-host.local");
-    expect((gatewayCall?.[0]?.txt as Record<string, string>)?.gatewayPort).toBe("18789");
+    expect((gatewayCall?.[0]?.txt as Record<string, string>)?.gatewayPort).toBe("19789");
     expect((gatewayCall?.[0]?.txt as Record<string, string>)?.sshPort).toBe("2222");
     expect((gatewayCall?.[0]?.txt as Record<string, string>)?.cliPath).toBe(
-      "/opt/homebrew/bin/openclaw",
+      "/opt/homebrew/bin/clawx",
     );
     expect((gatewayCall?.[0]?.txt as Record<string, string>)?.transport).toBe("gateway");
 
@@ -163,9 +163,9 @@ describe("gateway bonjour advertiser", () => {
     });
 
     const started = await startGatewayBonjourAdvertiser({
-      gatewayPort: 18789,
+      gatewayPort: 19789,
       sshPort: 2222,
-      cliPath: "/opt/homebrew/bin/openclaw",
+      cliPath: "/opt/homebrew/bin/clawx",
       minimal: true,
     });
 
@@ -182,7 +182,7 @@ describe("gateway bonjour advertiser", () => {
     process.env.NODE_ENV = "development";
 
     vi.spyOn(os, "hostname").mockReturnValue("test-host");
-    process.env.OPENCLAW_MDNS_HOSTNAME = "test-host";
+    process.env.CLAWX_MDNS_HOSTNAME = "test-host";
 
     const destroy = vi.fn().mockResolvedValue(undefined);
     const advertise = vi.fn().mockResolvedValue(undefined);
@@ -204,7 +204,7 @@ describe("gateway bonjour advertiser", () => {
     });
 
     const started = await startGatewayBonjourAdvertiser({
-      gatewayPort: 18789,
+      gatewayPort: 19789,
       sshPort: 2222,
     });
 
@@ -220,7 +220,7 @@ describe("gateway bonjour advertiser", () => {
     process.env.NODE_ENV = "development";
 
     vi.spyOn(os, "hostname").mockReturnValue("test-host");
-    process.env.OPENCLAW_MDNS_HOSTNAME = "test-host";
+    process.env.CLAWX_MDNS_HOSTNAME = "test-host";
 
     const destroy = vi.fn().mockResolvedValue(undefined);
     const advertise = vi.fn().mockResolvedValue(undefined);
@@ -247,7 +247,7 @@ describe("gateway bonjour advertiser", () => {
     registerUnhandledRejectionHandler.mockImplementation(() => cleanup);
 
     const started = await startGatewayBonjourAdvertiser({
-      gatewayPort: 18789,
+      gatewayPort: 19789,
       sshPort: 2222,
     });
 
@@ -265,7 +265,7 @@ describe("gateway bonjour advertiser", () => {
 
     vi.useFakeTimers();
     vi.spyOn(os, "hostname").mockReturnValue("test-host");
-    process.env.OPENCLAW_MDNS_HOSTNAME = "test-host";
+    process.env.CLAWX_MDNS_HOSTNAME = "test-host";
 
     const destroy = vi.fn().mockResolvedValue(undefined);
     const advertise = vi
@@ -286,7 +286,7 @@ describe("gateway bonjour advertiser", () => {
     });
 
     const started = await startGatewayBonjourAdvertiser({
-      gatewayPort: 18789,
+      gatewayPort: 19789,
       sshPort: 2222,
     });
 
@@ -313,7 +313,7 @@ describe("gateway bonjour advertiser", () => {
     process.env.NODE_ENV = "development";
 
     vi.spyOn(os, "hostname").mockReturnValue("test-host");
-    process.env.OPENCLAW_MDNS_HOSTNAME = "test-host";
+    process.env.CLAWX_MDNS_HOSTNAME = "test-host";
 
     const destroy = vi.fn().mockResolvedValue(undefined);
     const advertise = vi.fn(() => {
@@ -333,7 +333,7 @@ describe("gateway bonjour advertiser", () => {
     });
 
     const started = await startGatewayBonjourAdvertiser({
-      gatewayPort: 18789,
+      gatewayPort: 19789,
       sshPort: 2222,
     });
 
@@ -365,15 +365,15 @@ describe("gateway bonjour advertiser", () => {
     });
 
     const started = await startGatewayBonjourAdvertiser({
-      gatewayPort: 18789,
+      gatewayPort: 19789,
       sshPort: 2222,
     });
 
     const [gatewayCall] = createService.mock.calls as Array<[ServiceCall]>;
-    expect(gatewayCall?.[0]?.name).toBe("openclaw (OpenClaw)");
+    expect(gatewayCall?.[0]?.name).toBe("clawx (ClawX)");
     expect(gatewayCall?.[0]?.domain).toBe("local");
-    expect(gatewayCall?.[0]?.hostname).toBe("openclaw");
-    expect((gatewayCall?.[0]?.txt as Record<string, string>)?.lanHost).toBe("openclaw.local");
+    expect(gatewayCall?.[0]?.hostname).toBe("clawx");
+    expect((gatewayCall?.[0]?.txt as Record<string, string>)?.lanHost).toBe("clawx.local");
 
     await started.stop();
   });

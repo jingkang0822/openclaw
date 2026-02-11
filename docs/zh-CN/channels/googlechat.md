@@ -23,7 +23,7 @@ x-i18n:
    - 如果 API 尚未启用，请启用它。
 2. 创建一个**服务账号**：
    - 点击 **Create Credentials** > **Service Account**。
-   - 随意命名（例如 `openclaw-chat`）。
+   - 随意命名（例如 `clawx-chat`）。
    - 权限留空（点击 **Continue**）。
    - 有访问权限的主账号留空（点击 **Done**）。
 3. 创建并下载 **JSON 密钥**：
@@ -31,17 +31,17 @@ x-i18n:
    - 前往 **Keys** 标签页。
    - 点击 **Add Key** > **Create new key**。
    - 选择 **JSON** 并点击 **Create**。
-4. 将下载的 JSON 文件存储在 Gateway 网关主机上（例如 `~/.openclaw/googlechat-service-account.json`）。
+4. 将下载的 JSON 文件存储在 Gateway 网关主机上（例如 `~/.clawx/googlechat-service-account.json`）。
 5. 在 [Google Cloud Console Chat Configuration](https://console.cloud.google.com/apis/api/chat.googleapis.com/hangouts-chat) 中创建一个 Google Chat 应用：
    - 填写 **Application info**：
-     - **App name**：（例如 `OpenClaw`）
-     - **Avatar URL**：（例如 `https://openclaw.ai/logo.png`）
+     - **App name**：（例如 `ClawX`）
+     - **Avatar URL**：（例如 `https://clawx.ai/logo.png`）
      - **Description**：（例如 `Personal AI Assistant`）
    - 启用 **Interactive features**。
    - 在 **Functionality** 下，勾选 **Join spaces and group conversations**。
    - 在 **Connection settings** 下，选择 **HTTP endpoint URL**。
    - 在 **Triggers** 下，选择 **Use a common HTTP endpoint URL for all triggers** 并将其设置为你的 Gateway 网关公网 URL 后加 `/googlechat`。
-     - _提示：运行 `openclaw status` 查看你的 Gateway 网关公网 URL。_
+     - _提示：运行 `clawx status` 查看你的 Gateway 网关公网 URL。_
    - 在 **Visibility** 下，勾选 **Make this Chat app available to specific people and groups in &lt;Your Domain&gt;**。
    - 在文本框中输入你的邮箱地址（例如 `user@example.com`）。
    - 点击底部的 **Save**。
@@ -50,7 +50,7 @@ x-i18n:
    - 找到 **App status** 部分（通常在保存后位于顶部或底部附近）。
    - 将状态更改为 **Live - available to users**。
    - 再次点击 **Save**。
-7. 使用服务账号路径和 webhook audience 配置 OpenClaw：
+7. 使用服务账号路径和 webhook audience 配置 ClawX：
    - 环境变量：`GOOGLE_CHAT_SERVICE_ACCOUNT_FILE=/path/to/service-account.json`
    - 或配置：`channels.googlechat.serviceAccountFile: "/path/to/service-account.json"`。
 8. 设置 webhook audience 类型和值（与你的 Chat 应用配置匹配）。
@@ -70,7 +70,7 @@ Gateway 网关运行后，且你的邮箱已添加到可见性列表中：
 
 ## 公网 URL（仅 Webhook）
 
-Google Chat webhooks 需要一个公网 HTTPS 端点。为了安全起见，**只将 `/googlechat` 路径暴露到互联网**。将 OpenClaw 仪表板和其他敏感端点保留在你的私有网络上。
+Google Chat webhooks 需要一个公网 HTTPS 端点。为了安全起见，**只将 `/googlechat` 路径暴露到互联网**。将 ClawX 仪表板和其他敏感端点保留在你的私有网络上。
 
 ### 方案 A：Tailscale Funnel（推荐）
 
@@ -79,7 +79,7 @@ Google Chat webhooks 需要一个公网 HTTPS 端点。为了安全起见，**�
 1. **检查你的 Gateway 网关绑定的地址：**
 
    ```bash
-   ss -tlnp | grep 18789
+   ss -tlnp | grep 19789
    ```
 
    记下 IP 地址（例如 `127.0.0.1`、`0.0.0.0` 或你的 Tailscale IP 如 `100.x.x.x`）。
@@ -88,20 +88,20 @@ Google Chat webhooks 需要一个公网 HTTPS 端点。为了安全起见，**�
 
    ```bash
    # 如果绑定到 localhost（127.0.0.1 或 0.0.0.0）：
-   tailscale serve --bg --https 8443 http://127.0.0.1:18789
+   tailscale serve --bg --https 8443 http://127.0.0.1:19789
 
    # 如果仅绑定到 Tailscale IP（例如 100.106.161.80）：
-   tailscale serve --bg --https 8443 http://100.106.161.80:18789
+   tailscale serve --bg --https 8443 http://100.106.161.80:19789
    ```
 
 3. **仅公开暴露 webhook 路径：**
 
    ```bash
    # 如果绑定到 localhost（127.0.0.1 或 0.0.0.0）：
-   tailscale funnel --bg --set-path /googlechat http://127.0.0.1:18789/googlechat
+   tailscale funnel --bg --set-path /googlechat http://127.0.0.1:19789/googlechat
 
    # 如果仅绑定到 Tailscale IP（例如 100.106.161.80）：
-   tailscale funnel --bg --set-path /googlechat http://100.106.161.80:18789/googlechat
+   tailscale funnel --bg --set-path /googlechat http://100.106.161.80:19789/googlechat
    ```
 
 4. **授权节点访问 Funnel：**
@@ -129,30 +129,30 @@ Google Chat webhooks 需要一个公网 HTTPS 端点。为了安全起见，**�
 
 ```caddy
 your-domain.com {
-    reverse_proxy /googlechat* localhost:18789
+    reverse_proxy /googlechat* localhost:19789
 }
 ```
 
-使用此配置，任何发往 `your-domain.com/` 的请求将被忽略或返回 404，而 `your-domain.com/googlechat` 会安全地路由到 OpenClaw。
+使用此配置，任何发往 `your-domain.com/` 的请求将被忽略或返回 404，而 `your-domain.com/googlechat` 会安全地路由到 ClawX。
 
 ### 方案 C：Cloudflare Tunnel
 
 配置你的隧道入口规则，只路由 webhook 路径：
 
-- **路径**：`/googlechat` -> `http://localhost:18789/googlechat`
+- **路径**：`/googlechat` -> `http://localhost:19789/googlechat`
 - **默认规则**：HTTP 404（未找到）
 
 ## 工作原理
 
 1. Google Chat 向 Gateway 网关发送 webhook POST 请求。每个请求都包含一个 `Authorization: Bearer <token>` 头。
-2. OpenClaw 根据配置的 `audienceType` + `audience` 验证令牌：
+2. ClawX 根据配置的 `audienceType` + `audience` 验证令牌：
    - `audienceType: "app-url"` → audience 是你的 HTTPS webhook URL。
    - `audienceType: "project-number"` → audience 是 Cloud 项目编号。
 3. 消息按空间路由：
    - 私信使用会话键 `agent:<agentId>:googlechat:dm:<spaceId>`。
    - 空间使用会话键 `agent:<agentId>:googlechat:group:<spaceId>`。
 4. 私信访问默认为配对模式。未知发送者会收到配对码；使用以下命令批准：
-   - `openclaw pairing approve googlechat <code>`
+   - `clawx pairing approve googlechat <code>`
 5. 群组空间默认需要 @提及。如果提及检测需要应用的用户名，请使用 `botUser`。
 
 ## 目标标识符
@@ -218,7 +218,7 @@ status code: 405, reason phrase: HTTP error response: HTTP/1.1 405 Method Not Al
 1. **渠道未配置**：配置中缺少 `channels.googlechat` 部分。使用以下命令验证：
 
    ```bash
-   openclaw config get channels.googlechat
+   clawx config get channels.googlechat
    ```
 
    如果返回"Config path not found"，请添加配置（参见[配置要点](#配置要点)）。
@@ -226,29 +226,29 @@ status code: 405, reason phrase: HTTP error response: HTTP/1.1 405 Method Not Al
 2. **插件未启用**：检查插件状态：
 
    ```bash
-   openclaw plugins list | grep googlechat
+   clawx plugins list | grep googlechat
    ```
 
    如果显示"disabled"，请在配置中添加 `plugins.entries.googlechat.enabled: true`。
 
 3. **Gateway 网关未重启**：添加配置后，重启 Gateway 网关：
    ```bash
-   openclaw gateway restart
+   clawx gateway restart
    ```
 
 验证渠道是否正在运行：
 
 ```bash
-openclaw channels status
+clawx channels status
 # 应显示：Google Chat default: enabled, configured, ...
 ```
 
 ### 其他问题
 
-- 检查 `openclaw channels status --probe` 以查看认证错误或缺少 audience 配置。
+- 检查 `clawx channels status --probe` 以查看认证错误或缺少 audience 配置。
 - 如果没有收到消息，请确认 Chat 应用的 webhook URL 和事件订阅。
 - 如果提及门控阻止了回复，请将 `botUser` 设置为应用的用户资源名称并验证 `requireMention`。
-- 在发送测试消息时使用 `openclaw logs --follow` 查看请求是否到达 Gateway 网关。
+- 在发送测试消息时使用 `clawx logs --follow` 查看请求是否到达 Gateway 网关。
 
 相关文档：
 

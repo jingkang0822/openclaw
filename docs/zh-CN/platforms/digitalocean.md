@@ -1,8 +1,8 @@
 ---
 read_when:
-  - 在 DigitalOcean 上设置 OpenClaw
-  - 寻找便宜的 VPS 托管来运行 OpenClaw
-summary: 在 DigitalOcean 上运行 OpenClaw（简单的付费 VPS 选项）
+  - 在 DigitalOcean 上设置 ClawX
+  - 寻找便宜的 VPS 托管来运行 ClawX
+summary: 在 DigitalOcean 上运行 ClawX（简单的付费 VPS 选项）
 title: DigitalOcean
 x-i18n:
   generated_at: "2026-02-03T07:51:55Z"
@@ -13,11 +13,11 @@ x-i18n:
   workflow: 15
 ---
 
-# 在 DigitalOcean 上运行 OpenClaw
+# 在 DigitalOcean 上运行 ClawX
 
 ## 目标
 
-以 **$6/月**（或使用预留定价 $4/月）在 DigitalOcean 上运行持久的 OpenClaw Gateway 网关。
+以 **$6/月**（或使用预留定价 $4/月）在 DigitalOcean 上运行持久的 ClawX Gateway 网关。
 
 如果你想要 $0/月的选项且不介意 ARM + 特定提供商的设置，请参阅 [Oracle Cloud 指南](/platforms/oracle)。
 
@@ -63,7 +63,7 @@ x-i18n:
 ssh root@YOUR_DROPLET_IP
 ```
 
-## 3) 安装 OpenClaw
+## 3) 安装 ClawX
 
 ```bash
 # Update system
@@ -73,17 +73,17 @@ apt update && apt upgrade -y
 curl -fsSL https://deb.nodesource.com/setup_22.x | bash -
 apt install -y nodejs
 
-# Install OpenClaw
-curl -fsSL https://openclaw.ai/install.sh | bash
+# Install ClawX
+curl -fsSL https://clawx.ai/install.sh | bash
 
 # Verify
-openclaw --version
+clawx --version
 ```
 
 ## 4) 运行新手引导
 
 ```bash
-openclaw onboard --install-daemon
+clawx onboard --install-daemon
 ```
 
 向导将引导你完成：
@@ -97,13 +97,13 @@ openclaw onboard --install-daemon
 
 ```bash
 # Check status
-openclaw status
+clawx status
 
 # Check service
-systemctl --user status openclaw-gateway.service
+systemctl --user status clawx-gateway.service
 
 # View logs
-journalctl --user -u openclaw-gateway.service -f
+journalctl --user -u clawx-gateway.service -f
 ```
 
 ## 6) 访问控制面板
@@ -114,9 +114,9 @@ Gateway 网关默认绑定到 loopback。要访问控制界面：
 
 ```bash
 # From your local machine
-ssh -L 18789:localhost:18789 root@YOUR_DROPLET_IP
+ssh -L 19789:localhost:19789 root@YOUR_DROPLET_IP
 
-# Then open: http://localhost:18789
+# Then open: http://localhost:19789
 ```
 
 **选项 B：Tailscale Serve（HTTPS，仅 loopback）**
@@ -127,8 +127,8 @@ curl -fsSL https://tailscale.com/install.sh | sh
 tailscale up
 
 # Configure Gateway to use Tailscale Serve
-openclaw config set gateway.tailscale.mode serve
-openclaw gateway restart
+clawx config set gateway.tailscale.mode serve
+clawx gateway restart
 ```
 
 打开：`https://<magicdns>/`
@@ -141,25 +141,25 @@ openclaw gateway restart
 **选项 C：Tailnet 绑定（不使用 Serve）**
 
 ```bash
-openclaw config set gateway.bind tailnet
-openclaw gateway restart
+clawx config set gateway.bind tailnet
+clawx gateway restart
 ```
 
-打开：`http://<tailscale-ip>:18789`（需要令牌）。
+打开：`http://<tailscale-ip>:19789`（需要令牌）。
 
 ## 7) 连接你的渠道
 
 ### Telegram
 
 ```bash
-openclaw pairing list telegram
-openclaw pairing approve telegram <CODE>
+clawx pairing list telegram
+clawx pairing approve telegram <CODE>
 ```
 
 ### WhatsApp
 
 ```bash
-openclaw channels login whatsapp
+clawx channels login whatsapp
 # Scan QR code
 ```
 
@@ -201,13 +201,13 @@ htop
 
 所有状态存储在：
 
-- `~/.openclaw/` — 配置、凭证、会话数据
-- `~/.openclaw/workspace/` — 工作区（SOUL.md、记忆等）
+- `~/.clawx/` — 配置、凭证、会话数据
+- `~/.clawx/workspace/` — 工作区（SOUL.md、记忆等）
 
 这些在重启后保留。定期备份：
 
 ```bash
-tar -czvf openclaw-backup.tar.gz ~/.openclaw ~/.openclaw/workspace
+tar -czvf clawx-backup.tar.gz ~/.clawx ~/.clawx/workspace
 ```
 
 ---
@@ -237,15 +237,15 @@ Oracle Cloud 提供 **Always Free** ARM 实例，比这里任何付费选项都�
 ### Gateway 网关无法启动
 
 ```bash
-openclaw gateway status
-openclaw doctor --non-interactive
-journalctl -u openclaw --no-pager -n 50
+clawx gateway status
+clawx doctor --non-interactive
+journalctl -u clawx --no-pager -n 50
 ```
 
 ### 端口已被使用
 
 ```bash
-lsof -i :18789
+lsof -i :19789
 kill <PID>
 ```
 

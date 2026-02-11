@@ -1,4 +1,4 @@
-import OpenClawKit
+import ClawXKit
 import Network
 import Observation
 import SwiftUI
@@ -23,21 +23,21 @@ struct SettingsTab: View {
     @AppStorage("talk.enabled") private var talkEnabled: Bool = false
     @AppStorage("talk.button.enabled") private var talkButtonEnabled: Bool = true
     @AppStorage("camera.enabled") private var cameraEnabled: Bool = true
-    @AppStorage("location.enabledMode") private var locationEnabledModeRaw: String = OpenClawLocationMode.off.rawValue
+    @AppStorage("location.enabledMode") private var locationEnabledModeRaw: String = ClawXLocationMode.off.rawValue
     @AppStorage("location.preciseEnabled") private var locationPreciseEnabled: Bool = true
     @AppStorage("screen.preventSleep") private var preventSleep: Bool = true
     @AppStorage("gateway.preferredStableID") private var preferredGatewayStableID: String = ""
     @AppStorage("gateway.lastDiscoveredStableID") private var lastDiscoveredGatewayStableID: String = ""
     @AppStorage("gateway.manual.enabled") private var manualGatewayEnabled: Bool = false
     @AppStorage("gateway.manual.host") private var manualGatewayHost: String = ""
-    @AppStorage("gateway.manual.port") private var manualGatewayPort: Int = 18789
+    @AppStorage("gateway.manual.port") private var manualGatewayPort: Int = 19789
     @AppStorage("gateway.manual.tls") private var manualGatewayTLS: Bool = true
     @AppStorage("gateway.discovery.debugLogs") private var discoveryDebugLogsEnabled: Bool = false
     @AppStorage("canvas.debugStatusEnabled") private var canvasDebugStatusEnabled: Bool = false
     @State private var connectStatus = ConnectStatusStore()
     @State private var connectingGatewayID: String?
     @State private var localIPAddress: String?
-    @State private var lastLocationModeRaw: String = OpenClawLocationMode.off.rawValue
+    @State private var lastLocationModeRaw: String = ClawXLocationMode.off.rawValue
     @State private var gatewayToken: String = ""
     @State private var gatewayPassword: String = ""
 
@@ -144,7 +144,7 @@ struct SettingsTab: View {
 
                         Text(
                             "Use this when mDNS/Bonjour discovery is blocked. "
-                                + "The gateway WebSocket listens on port 18789 by default.")
+                                + "The gateway WebSocket listens on port 19789 by default.")
                             .font(.footnote)
                             .foregroundStyle(.secondary)
 
@@ -197,9 +197,9 @@ struct SettingsTab: View {
 
                 Section("Location") {
                     Picker("Location Access", selection: self.$locationEnabledModeRaw) {
-                        Text("Off").tag(OpenClawLocationMode.off.rawValue)
-                        Text("While Using").tag(OpenClawLocationMode.whileUsing.rawValue)
-                        Text("Always").tag(OpenClawLocationMode.always.rawValue)
+                        Text("Off").tag(ClawXLocationMode.off.rawValue)
+                        Text("While Using").tag(ClawXLocationMode.whileUsing.rawValue)
+                        Text("Always").tag(ClawXLocationMode.always.rawValue)
                     }
                     .pickerStyle(.segmented)
 
@@ -213,7 +213,7 @@ struct SettingsTab: View {
 
                 Section("Screen") {
                     Toggle("Prevent Sleep", isOn: self.$preventSleep)
-                    Text("Keeps the screen awake while OpenClaw is open.")
+                    Text("Keeps the screen awake while ClawX is open.")
                         .font(.footnote)
                         .foregroundStyle(.secondary)
                 }
@@ -261,7 +261,7 @@ struct SettingsTab: View {
             .onChange(of: self.locationEnabledModeRaw) { _, newValue in
                 let previous = self.lastLocationModeRaw
                 self.lastLocationModeRaw = newValue
-                guard let mode = OpenClawLocationMode(rawValue: newValue) else { return }
+                guard let mode = ClawXLocationMode(rawValue: newValue) else { return }
                 Task {
                     let granted = await self.appModel.requestLocationPermissions(mode: mode)
                     if !granted {
@@ -336,8 +336,8 @@ struct SettingsTab: View {
         return "iOS \(v.majorVersion).\(v.minorVersion).\(v.patchVersion)"
     }
 
-    private var locationMode: OpenClawLocationMode {
-        OpenClawLocationMode(rawValue: self.locationEnabledModeRaw) ?? .off
+    private var locationMode: ClawXLocationMode {
+        ClawXLocationMode(rawValue: self.locationEnabledModeRaw) ?? .off
     }
 
     private func appVersion() -> String {

@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import type { ConfigFileSnapshot } from "./types.openclaw.js";
+import type { ConfigFileSnapshot } from "./types.clawx.js";
 import {
   REDACTED_SENTINEL,
   redactConfigSnapshot,
@@ -8,7 +8,7 @@ import {
 
 function makeSnapshot(config: Record<string, unknown>, raw?: string): ConfigFileSnapshot {
   return {
-    path: "/home/user/.openclaw/config.json5",
+    path: "/home/user/.clawx/config.json5",
     exists: true,
     raw: raw ?? JSON.stringify(config),
     parsed: config,
@@ -102,7 +102,7 @@ describe("redactConfigSnapshot", () => {
   it("preserves non-sensitive fields", () => {
     const snapshot = makeSnapshot({
       ui: { seamColor: "#0088cc" },
-      gateway: { port: 18789 },
+      gateway: { port: 19789 },
       models: { providers: { openai: { baseUrl: "https://api.openai.com" } } },
     });
     const result = redactConfigSnapshot(snapshot);
@@ -255,7 +255,7 @@ describe("restoreRedactedValues", () => {
     };
     const original = {
       ui: { seamColor: "#0088cc" },
-      gateway: { port: 18789, auth: { token: "real-secret" } },
+      gateway: { port: 19789, auth: { token: "real-secret" } },
     };
     const result = restoreRedactedValues(incoming, original) as typeof incoming;
     expect(result.ui.seamColor).toBe("#ff0000");
@@ -304,7 +304,7 @@ describe("restoreRedactedValues", () => {
 
   it("round-trips config through redact → restore", () => {
     const originalConfig = {
-      gateway: { auth: { token: "gateway-auth-secret-token-value" }, port: 18789 },
+      gateway: { auth: { token: "gateway-auth-secret-token-value" }, port: 19789 },
       channels: {
         slack: { botToken: "fake-slack-token-placeholder-value" },
         telegram: {

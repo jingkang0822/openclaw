@@ -3,7 +3,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 const callGateway = vi.fn(async () => ({ ok: true }));
 const resolveGatewayProgramArguments = vi.fn(async () => ({
-  programArguments: ["/bin/node", "cli", "gateway", "--port", "18789"],
+  programArguments: ["/bin/node", "cli", "gateway", "--port", "19789"],
 }));
 const serviceInstall = vi.fn().mockResolvedValue(undefined);
 const serviceUninstall = vi.fn().mockResolvedValue(undefined);
@@ -64,7 +64,7 @@ vi.mock("../daemon/inspect.js", () => ({
 
 vi.mock("../infra/ports.js", () => ({
   inspectPortUsage: (port: number) => inspectPortUsage(port),
-  formatPortDiagnostics: () => ["Port 18789 is already in use."],
+  formatPortDiagnostics: () => ["Port 19789 is already in use."],
 }));
 
 vi.mock("../runtime.js", () => ({
@@ -81,43 +81,43 @@ vi.mock("./progress.js", () => ({
 
 describe("daemon-cli coverage", () => {
   const originalEnv = {
-    OPENCLAW_STATE_DIR: process.env.OPENCLAW_STATE_DIR,
-    OPENCLAW_CONFIG_PATH: process.env.OPENCLAW_CONFIG_PATH,
-    OPENCLAW_GATEWAY_PORT: process.env.OPENCLAW_GATEWAY_PORT,
-    OPENCLAW_PROFILE: process.env.OPENCLAW_PROFILE,
+    CLAWX_STATE_DIR: process.env.CLAWX_STATE_DIR,
+    CLAWX_CONFIG_PATH: process.env.CLAWX_CONFIG_PATH,
+    CLAWX_GATEWAY_PORT: process.env.CLAWX_GATEWAY_PORT,
+    CLAWX_PROFILE: process.env.CLAWX_PROFILE,
   };
 
   beforeEach(() => {
-    process.env.OPENCLAW_STATE_DIR = "/tmp/openclaw-cli-state";
-    process.env.OPENCLAW_CONFIG_PATH = "/tmp/openclaw-cli-state/openclaw.json";
-    delete process.env.OPENCLAW_GATEWAY_PORT;
-    delete process.env.OPENCLAW_PROFILE;
+    process.env.CLAWX_STATE_DIR = "/tmp/clawx-cli-state";
+    process.env.CLAWX_CONFIG_PATH = "/tmp/clawx-cli-state/clawx.json";
+    delete process.env.CLAWX_GATEWAY_PORT;
+    delete process.env.CLAWX_PROFILE;
     serviceReadCommand.mockResolvedValue(null);
   });
 
   afterEach(() => {
-    if (originalEnv.OPENCLAW_STATE_DIR !== undefined) {
-      process.env.OPENCLAW_STATE_DIR = originalEnv.OPENCLAW_STATE_DIR;
+    if (originalEnv.CLAWX_STATE_DIR !== undefined) {
+      process.env.CLAWX_STATE_DIR = originalEnv.CLAWX_STATE_DIR;
     } else {
-      delete process.env.OPENCLAW_STATE_DIR;
+      delete process.env.CLAWX_STATE_DIR;
     }
 
-    if (originalEnv.OPENCLAW_CONFIG_PATH !== undefined) {
-      process.env.OPENCLAW_CONFIG_PATH = originalEnv.OPENCLAW_CONFIG_PATH;
+    if (originalEnv.CLAWX_CONFIG_PATH !== undefined) {
+      process.env.CLAWX_CONFIG_PATH = originalEnv.CLAWX_CONFIG_PATH;
     } else {
-      delete process.env.OPENCLAW_CONFIG_PATH;
+      delete process.env.CLAWX_CONFIG_PATH;
     }
 
-    if (originalEnv.OPENCLAW_GATEWAY_PORT !== undefined) {
-      process.env.OPENCLAW_GATEWAY_PORT = originalEnv.OPENCLAW_GATEWAY_PORT;
+    if (originalEnv.CLAWX_GATEWAY_PORT !== undefined) {
+      process.env.CLAWX_GATEWAY_PORT = originalEnv.CLAWX_GATEWAY_PORT;
     } else {
-      delete process.env.OPENCLAW_GATEWAY_PORT;
+      delete process.env.CLAWX_GATEWAY_PORT;
     }
 
-    if (originalEnv.OPENCLAW_PROFILE !== undefined) {
-      process.env.OPENCLAW_PROFILE = originalEnv.OPENCLAW_PROFILE;
+    if (originalEnv.CLAWX_PROFILE !== undefined) {
+      process.env.CLAWX_PROFILE = originalEnv.CLAWX_PROFILE;
     } else {
-      delete process.env.OPENCLAW_PROFILE;
+      delete process.env.CLAWX_PROFILE;
     }
   });
 
@@ -148,10 +148,10 @@ describe("daemon-cli coverage", () => {
     serviceReadCommand.mockResolvedValueOnce({
       programArguments: ["/bin/node", "cli", "gateway", "--port", "19001"],
       environment: {
-        OPENCLAW_PROFILE: "dev",
-        OPENCLAW_STATE_DIR: "/tmp/openclaw-daemon-state",
-        OPENCLAW_CONFIG_PATH: "/tmp/openclaw-daemon-state/openclaw.json",
-        OPENCLAW_GATEWAY_PORT: "19001",
+        CLAWX_PROFILE: "dev",
+        CLAWX_STATE_DIR: "/tmp/clawx-daemon-state",
+        CLAWX_CONFIG_PATH: "/tmp/clawx-daemon-state/clawx.json",
+        CLAWX_GATEWAY_PORT: "19001",
       },
       sourcePath: "/tmp/bot.molt.gateway.plist",
     });
@@ -210,7 +210,7 @@ describe("daemon-cli coverage", () => {
     program.exitOverride();
     registerDaemonCli(program);
 
-    await program.parseAsync(["daemon", "install", "--port", "18789"], {
+    await program.parseAsync(["daemon", "install", "--port", "19789"], {
       from: "user",
     });
 
@@ -228,7 +228,7 @@ describe("daemon-cli coverage", () => {
     program.exitOverride();
     registerDaemonCli(program);
 
-    await program.parseAsync(["daemon", "install", "--port", "18789", "--json"], {
+    await program.parseAsync(["daemon", "install", "--port", "19789", "--json"], {
       from: "user",
     });
 

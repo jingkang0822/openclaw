@@ -100,7 +100,7 @@ vi.mock("../daemon/service.js", () => ({
 
 vi.mock("../daemon/program-args.js", () => ({
   resolveGatewayProgramArguments: async () => ({
-    programArguments: ["/bin/node", "cli", "gateway", "--port", "18789"],
+    programArguments: ["/bin/node", "cli", "gateway", "--port", "19789"],
   }),
 }));
 
@@ -152,13 +152,13 @@ describe("gateway-cli coverage", () => {
     discoverGatewayBeacons.mockReset();
     discoverGatewayBeacons.mockResolvedValueOnce([
       {
-        instanceName: "Studio (OpenClaw)",
+        instanceName: "Studio (ClawX)",
         displayName: "Studio",
         domain: "local.",
         host: "studio.local",
         lanHost: "studio.local",
         tailnetDns: "studio.tailnet.ts.net",
-        gatewayPort: 18789,
+        gatewayPort: 19789,
         sshPort: 22,
       },
     ]);
@@ -184,13 +184,13 @@ describe("gateway-cli coverage", () => {
     discoverGatewayBeacons.mockReset();
     discoverGatewayBeacons.mockResolvedValueOnce([
       {
-        instanceName: "Studio (OpenClaw)",
+        instanceName: "Studio (ClawX)",
         displayName: "Studio",
-        domain: "openclaw.internal.",
-        host: "studio.openclaw.internal",
+        domain: "clawx.internal.",
+        host: "studio.clawx.internal",
         lanHost: "studio.local",
         tailnetDns: "studio.tailnet.ts.net",
-        gatewayPort: 18789,
+        gatewayPort: 19789,
         sshPort: 22,
       },
     ]);
@@ -207,10 +207,10 @@ describe("gateway-cli coverage", () => {
     const out = runtimeLogs.join("\n");
     expect(out).toContain("Gateway Discovery");
     expect(out).toContain("Found 1 gateway(s)");
-    expect(out).toContain("- Studio openclaw.internal.");
+    expect(out).toContain("- Studio clawx.internal.");
     expect(out).toContain("  tailnet: studio.tailnet.ts.net");
-    expect(out).toContain("  host: studio.openclaw.internal");
-    expect(out).toContain("  ws: ws://studio.tailnet.ts.net:18789");
+    expect(out).toContain("  host: studio.clawx.internal");
+    expect(out).toContain("  ws: ws://studio.tailnet.ts.net:19789");
   });
 
   it("validates gateway discover timeout", async () => {
@@ -276,7 +276,7 @@ describe("gateway-cli coverage", () => {
     registerGatewayCli(programForceFail);
     await expect(
       programForceFail.parseAsync(
-        ["gateway", "--port", "18789", "--token", "test-token", "--force", "--allow-unconfigured"],
+        ["gateway", "--port", "19789", "--token", "test-token", "--force", "--allow-unconfigured"],
         { from: "user" },
       ),
     ).rejects.toThrow("__exit__:1");
@@ -290,7 +290,7 @@ describe("gateway-cli coverage", () => {
     const beforeSigint = new Set(process.listeners("SIGINT"));
     await expect(
       programStartFail.parseAsync(
-        ["gateway", "--port", "18789", "--token", "test-token", "--allow-unconfigured"],
+        ["gateway", "--port", "19789", "--token", "test-token", "--allow-unconfigured"],
         {
           from: "user",
         },
@@ -335,7 +335,7 @@ describe("gateway-cli coverage", () => {
   });
 
   it("uses env/config port when --port is omitted", async () => {
-    await withEnvOverride({ OPENCLAW_GATEWAY_PORT: "19001" }, async () => {
+    await withEnvOverride({ CLAWX_GATEWAY_PORT: "19001" }, async () => {
       runtimeLogs.length = 0;
       runtimeErrors.length = 0;
       startGatewayServer.mockClear();

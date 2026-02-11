@@ -2,7 +2,7 @@
 set -euo pipefail
 
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
-IMAGE_NAME="openclaw-onboard-e2e"
+IMAGE_NAME="clawx-onboard-e2e"
 
 echo "Building Docker image..."
 docker build -t "$IMAGE_NAME" -f "$ROOT_DIR/scripts/e2e/Dockerfile" "$ROOT_DIR"
@@ -15,20 +15,20 @@ docker run --rm -t "$IMAGE_NAME" bash -lc '
 	  ONBOARD_FLAGS="--flow quickstart --auth-choice skip --skip-channels --skip-skills --skip-daemon --skip-ui"
 	  # tsdown may emit dist/index.js or dist/index.mjs depending on runtime/bundler.
 	  if [ -f dist/index.mjs ]; then
-	    OPENCLAW_ENTRY="dist/index.mjs"
+	    CLAWX_ENTRY="dist/index.mjs"
 	  elif [ -f dist/index.js ]; then
-	    OPENCLAW_ENTRY="dist/index.js"
+	    CLAWX_ENTRY="dist/index.js"
 	  else
 	    echo "Missing dist/index.(m)js (build output):"
 	    ls -la dist || true
 	    exit 1
 	  fi
-	  export OPENCLAW_ENTRY
+	  export CLAWX_ENTRY
 
   # Provide a minimal trash shim to avoid noisy "missing trash" logs in containers.
-  export PATH="/tmp/openclaw-bin:$PATH"
-  mkdir -p /tmp/openclaw-bin
-  cat > /tmp/openclaw-bin/trash <<'"'"'TRASH'"'"'
+  export PATH="/tmp/clawx-bin:$PATH"
+  mkdir -p /tmp/clawx-bin
+  cat > /tmp/clawx-bin/trash <<'"'"'TRASH'"'"'
 #!/usr/bin/env bash
 set -euo pipefail
 trash_dir="$HOME/.Trash"
@@ -43,7 +43,7 @@ for target in "$@"; do
   mv "$target" "$dest"
 done
 TRASH
-  chmod +x /tmp/openclaw-bin/trash
+  chmod +x /tmp/clawx-bin/trash
 
   send() {
     local payload="$1"
@@ -94,7 +94,7 @@ TRASH
   }
 
 	  start_gateway() {
-	    node "$OPENCLAW_ENTRY" gateway --port 18789 --bind loopback --allow-unconfigured > /tmp/gateway-e2e.log 2>&1 &
+	    node "$CLAWX_ENTRY" gateway --port 19789 --bind loopback --allow-unconfigured > /tmp/gateway-e2e.log 2>&1 &
 	    GATEWAY_PID="$!"
 	  }
 
@@ -102,7 +102,7 @@ TRASH
     for _ in $(seq 1 20); do
       if node --input-type=module -e "
         import net from 'node:net';
-        const socket = net.createConnection({ host: '127.0.0.1', port: 18789 });
+        const socket = net.createConnection({ host: '127.0.0.1', port: 19789 });
         const timeout = setTimeout(() => {
           socket.destroy();
           process.exit(1);
@@ -119,7 +119,7 @@ TRASH
       " >/dev/null 2>&1; then
         return 0
       fi
-      if [ -f /tmp/gateway-e2e.log ] && grep -E -q "listening on ws://[^ ]+:18789" /tmp/gateway-e2e.log; then
+      if [ -f /tmp/gateway-e2e.log ] && grep -E -q "listening on ws://[^ ]+:19789" /tmp/gateway-e2e.log; then
         if [ -n "${GATEWAY_PID:-}" ] && kill -0 "$GATEWAY_PID" 2>/dev/null; then
           return 0
         fi
@@ -151,9 +151,9 @@ TRASH
     export HOME="$home_dir"
     mkdir -p "$HOME"
 
-    input_fifo="$(mktemp -u "/tmp/openclaw-onboard-${case_name}.XXXXXX")"
+    input_fifo="$(mktemp -u "/tmp/clawx-onboard-${case_name}.XXXXXX")"
     mkfifo "$input_fifo"
-    local log_path="/tmp/openclaw-onboard-${case_name}.log"
+    local log_path="/tmp/clawx-onboard-${case_name}.log"
     WIZARD_LOG_PATH="$log_path"
     export WIZARD_LOG_PATH
     # Run under script to keep an interactive TTY for clack prompts.
@@ -196,11 +196,11 @@ TRASH
     local validate_fn="${4:-}"
 
 	    # Default onboarding command wrapper.
-	    run_wizard_cmd "$case_name" "$home_dir" "node \"$OPENCLAW_ENTRY\" onboard $ONBOARD_FLAGS" "$send_fn" true "$validate_fn"
+	    run_wizard_cmd "$case_name" "$home_dir" "node \"$CLAWX_ENTRY\" onboard $ONBOARD_FLAGS" "$send_fn" true "$validate_fn"
 	  }
 
   make_home() {
-    mktemp -d "/tmp/openclaw-e2e-$1.XXXXXX"
+    mktemp -d "/tmp/clawx-e2e-$1.XXXXXX"
   }
 
   assert_file() {
@@ -279,7 +279,7 @@ TRASH
 	    home_dir="$(make_home local-basic)"
 	    export HOME="$home_dir"
 	    mkdir -p "$HOME"
-	    node "$OPENCLAW_ENTRY" onboard \
+	    node "$CLAWX_ENTRY" onboard \
 	      --non-interactive \
 	      --accept-risk \
       --flow quickstart \
@@ -291,9 +291,9 @@ TRASH
       --skip-health
 
     # Assert config + workspace scaffolding.
-    workspace_dir="$HOME/.openclaw/workspace"
-    config_path="$HOME/.openclaw/openclaw.json"
-    sessions_dir="$HOME/.openclaw/agents/main/sessions"
+    workspace_dir="$HOME/.clawx/workspace"
+    config_path="$HOME/.clawx/clawx.json"
+    sessions_dir="$HOME/.clawx/agents/main/sessions"
 
     assert_file "$config_path"
     assert_dir "$sessions_dir"
@@ -356,14 +356,14 @@ NODE
     export HOME="$home_dir"
 	    mkdir -p "$HOME"
 	    # Smoke test non-interactive remote config write.
-	    node "$OPENCLAW_ENTRY" onboard --non-interactive --accept-risk \
+	    node "$CLAWX_ENTRY" onboard --non-interactive --accept-risk \
 	      --mode remote \
-	      --remote-url ws://gateway.local:18789 \
+	      --remote-url ws://gateway.local:19789 \
       --remote-token remote-token \
       --skip-skills \
       --skip-health
 
-    config_path="$HOME/.openclaw/openclaw.json"
+    config_path="$HOME/.clawx/clawx.json"
     assert_file "$config_path"
 
     CONFIG_PATH="$config_path" node --input-type=module - <<'"'"'NODE'"'"'
@@ -376,7 +376,7 @@ const errors = [];
 if (cfg?.gateway?.mode !== "remote") {
   errors.push(`gateway.mode mismatch (got ${cfg?.gateway?.mode ?? "unset"})`);
 }
-if (cfg?.gateway?.remote?.url !== "ws://gateway.local:18789") {
+if (cfg?.gateway?.remote?.url !== "ws://gateway.local:19789") {
   errors.push(`gateway.remote.url mismatch (got ${cfg?.gateway?.remote?.url ?? "unset"})`);
 }
 if (cfg?.gateway?.remote?.token !== "remote-token") {
@@ -397,19 +397,19 @@ NODE
     local home_dir
     home_dir="$(make_home reset-config)"
     export HOME="$home_dir"
-    mkdir -p "$HOME/.openclaw"
+    mkdir -p "$HOME/.clawx"
     # Seed a remote config to exercise reset path.
-	    cat > "$HOME/.openclaw/openclaw.json" <<'"'"'JSON'"'"'
+	    cat > "$HOME/.clawx/clawx.json" <<'"'"'JSON'"'"'
 {
   "agents": { "defaults": { "workspace": "/root/old" } },
   "gateway": {
     "mode": "remote",
-    "remote": { "url": "ws://old.example:18789", "token": "old-token" }
+    "remote": { "url": "ws://old.example:19789", "token": "old-token" }
   }
 }
 JSON
 
-	    node "$OPENCLAW_ENTRY" onboard \
+	    node "$CLAWX_ENTRY" onboard \
 	      --non-interactive \
 	      --accept-risk \
       --flow quickstart \
@@ -421,7 +421,7 @@ JSON
       --skip-ui \
       --skip-health
 
-    config_path="$HOME/.openclaw/openclaw.json"
+    config_path="$HOME/.clawx/clawx.json"
     assert_file "$config_path"
 
     CONFIG_PATH="$config_path" node --input-type=module - <<'"'"'NODE'"'"'
@@ -452,9 +452,9 @@ NODE
 	    local home_dir
 	    home_dir="$(make_home channels)"
 	    # Channels-only configure flow.
-	    run_wizard_cmd channels "$home_dir" "node \"$OPENCLAW_ENTRY\" configure --section channels" send_channels_flow
+	    run_wizard_cmd channels "$home_dir" "node \"$CLAWX_ENTRY\" configure --section channels" send_channels_flow
 
-    config_path="$HOME/.openclaw/openclaw.json"
+    config_path="$HOME/.clawx/clawx.json"
     assert_file "$config_path"
 
     CONFIG_PATH="$config_path" node --input-type=module - <<'"'"'NODE'"'"'
@@ -492,9 +492,9 @@ NODE
     local home_dir
     home_dir="$(make_home skills)"
     export HOME="$home_dir"
-    mkdir -p "$HOME/.openclaw"
+    mkdir -p "$HOME/.clawx"
     # Seed skills config to ensure it survives the wizard.
-	    cat > "$HOME/.openclaw/openclaw.json" <<'"'"'JSON'"'"'
+	    cat > "$HOME/.clawx/clawx.json" <<'"'"'JSON'"'"'
 {
   "skills": {
     "allowBundled": ["__none__"],
@@ -503,9 +503,9 @@ NODE
 }
 JSON
 
-	    run_wizard_cmd skills "$home_dir" "node \"$OPENCLAW_ENTRY\" configure --section skills" send_skills_flow
+	    run_wizard_cmd skills "$home_dir" "node \"$CLAWX_ENTRY\" configure --section skills" send_skills_flow
 
-    config_path="$HOME/.openclaw/openclaw.json"
+    config_path="$HOME/.clawx/clawx.json"
     assert_file "$config_path"
 
     CONFIG_PATH="$config_path" node --input-type=module - <<'"'"'NODE'"'"'

@@ -4,7 +4,7 @@ import os from "node:os";
 import path from "node:path";
 import { forceFreePort, type PortProcess } from "../src/cli/ports.js";
 
-const DEFAULT_PORT = 18789;
+const DEFAULT_PORT = 19789;
 
 function killGatewayListeners(port: number): PortProcess[] {
   try {
@@ -27,13 +27,13 @@ function killGatewayListeners(port: number): PortProcess[] {
 
 function runTests() {
   const isolatedLock =
-    process.env.OPENCLAW_GATEWAY_LOCK ??
-    path.join(os.tmpdir(), `openclaw-gateway.lock.test.${Date.now()}`);
+    process.env.CLAWX_GATEWAY_LOCK ??
+    path.join(os.tmpdir(), `clawx-gateway.lock.test.${Date.now()}`);
   const result = spawnSync("pnpm", ["vitest", "run"], {
     stdio: "inherit",
     env: {
       ...process.env,
-      OPENCLAW_GATEWAY_LOCK: isolatedLock,
+      CLAWX_GATEWAY_LOCK: isolatedLock,
     },
   });
   if (result.error) {
@@ -44,7 +44,7 @@ function runTests() {
 }
 
 function main() {
-  const port = Number.parseInt(process.env.OPENCLAW_GATEWAY_PORT ?? `${DEFAULT_PORT}`, 10);
+  const port = Number.parseInt(process.env.CLAWX_GATEWAY_PORT ?? `${DEFAULT_PORT}`, 10);
 
   console.log(`🧹 test:force - clearing gateway on port ${port}`);
   const killed = killGatewayListeners(port);

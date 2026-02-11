@@ -1,5 +1,5 @@
 import type { MessagingToolSend } from "../../agents/pi-embedded-messaging.js";
-import type { OpenClawConfig } from "../../config/config.js";
+import type { ClawXConfig } from "../../config/config.js";
 import type { AgentDefaultsConfig } from "../../config/types.js";
 import type { CronJob } from "../types.js";
 import {
@@ -108,7 +108,7 @@ export type RunCronAgentTurnResult = {
 };
 
 export async function runCronIsolatedAgentTurn(params: {
-  cfg: OpenClawConfig;
+  cfg: ClawXConfig;
   deps: CliDeps;
   job: CronJob;
   message: string;
@@ -139,7 +139,7 @@ export async function runCronIsolatedAgentTurn(params: {
   } else if (overrideModel) {
     agentCfg.model = overrideModel;
   }
-  const cfgWithAgentDefaults: OpenClawConfig = {
+  const cfgWithAgentDefaults: ClawXConfig = {
     ...params.cfg,
     agents: Object.assign({}, params.cfg.agents, { defaults: agentCfg }),
   };
@@ -521,9 +521,9 @@ export async function runCronIsolatedAgentTurn(params: {
       logWarn(`[cron:${params.job.id}] ${message}`);
       return withRunSession({ status: "ok", summary, outputText });
     }
-    // Shared subagent announce flow is text-based; keep direct outbound delivery
-    // for media/channel payloads so structured content is preserved.
-    if (deliveryPayloadHasStructuredContent) {
+    // Use direct outbound delivery for structured content, or when delivery mode
+    // is "direct" (skip announce flow to agent session, send straight to channel).
+    if (deliveryPayloadHasStructuredContent || deliveryPlan.mode === "direct") {
       try {
         await deliverOutboundPayloads({
           cfg: cfgWithAgentDefaults,

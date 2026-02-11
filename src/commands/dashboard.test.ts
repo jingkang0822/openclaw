@@ -41,7 +41,7 @@ function resetRuntime() {
 
 function mockSnapshot(token = "abc") {
   mocks.readConfigFileSnapshot.mockResolvedValue({
-    path: "/tmp/openclaw.json",
+    path: "/tmp/clawx.json",
     exists: true,
     raw: "{}",
     parsed: {},
@@ -50,10 +50,10 @@ function mockSnapshot(token = "abc") {
     issues: [],
     legacyIssues: [],
   });
-  mocks.resolveGatewayPort.mockReturnValue(18789);
+  mocks.resolveGatewayPort.mockReturnValue(19789);
   mocks.resolveControlUiLinks.mockReturnValue({
-    httpUrl: "http://127.0.0.1:18789/",
-    wsUrl: "ws://127.0.0.1:18789",
+    httpUrl: "http://127.0.0.1:19789/",
+    wsUrl: "ws://127.0.0.1:19789",
   });
 }
 
@@ -78,15 +78,15 @@ describe("dashboardCommand", () => {
     await dashboardCommand(runtime);
 
     expect(mocks.resolveControlUiLinks).toHaveBeenCalledWith({
-      port: 18789,
+      port: 19789,
       bind: "loopback",
       customBindHost: undefined,
       basePath: undefined,
     });
-    expect(mocks.copyToClipboard).toHaveBeenCalledWith("http://127.0.0.1:18789/#token=abc123");
-    expect(mocks.openUrl).toHaveBeenCalledWith("http://127.0.0.1:18789/#token=abc123");
+    expect(mocks.copyToClipboard).toHaveBeenCalledWith("http://127.0.0.1:19789/#token=abc123");
+    expect(mocks.openUrl).toHaveBeenCalledWith("http://127.0.0.1:19789/#token=abc123");
     expect(runtime.log).toHaveBeenCalledWith(
-      "Opened in your browser. Keep that tab to control OpenClaw.",
+      "Opened in your browser. Keep that tab to control ClawX.",
     );
   });
 

@@ -1,12 +1,12 @@
 {
-  "name": "@openclaw/signal",
+  "name": "@clawx/signal",
   "version": "2026.2.6-3",
-  "description": "OpenClaw Signal channel plugin",
+  "description": "ClawX Signal channel plugin",
   "type": "module",
   "devDependencies": {
-    "openclaw": "workspace:*"
+    "clawx": "workspace:*"
   },
-  "openclaw": {
+  "clawx": {
     "extensions": [
       "./index.ts"
     ]

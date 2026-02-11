@@ -2,7 +2,7 @@
 summary: "Webhook ingress for wake and isolated agent runs"
 read_when:
   - Adding or changing webhook endpoints
-  - Wiring external systems into OpenClaw
+  - Wiring external systems into ClawX
 title: "Webhooks"
 ---
 
@@ -32,7 +32,7 @@ Notes:
 Every request must include the hook token. Prefer headers:
 
 - `Authorization: Bearer <token>` (recommended)
-- `x-openclaw-token: <token>`
+- `x-clawx-token: <token>`
 - `?token=<token>` (deprecated; logs a warning and will be removed in a future major release)
 
 ## Endpoints
@@ -106,7 +106,7 @@ Mapping options (summary):
   (`channel` defaults to `last` and falls back to WhatsApp).
 - `allowUnsafeExternalContent: true` disables the external content safety wrapper for that hook
   (dangerous; only for trusted internal sources).
-- `openclaw webhooks gmail setup` writes `hooks.gmail` config for `openclaw webhooks gmail run`.
+- `clawx webhooks gmail setup` writes `hooks.gmail` config for `clawx webhooks gmail run`.
   See [Gmail Pub/Sub](/automation/gmail-pubsub) for the full Gmail watch flow.
 
 ## Responses
@@ -120,15 +120,15 @@ Mapping options (summary):
 ## Examples
 
 ```bash
-curl -X POST http://127.0.0.1:18789/hooks/wake \
+curl -X POST http://127.0.0.1:19789/hooks/wake \
   -H 'Authorization: Bearer SECRET' \
   -H 'Content-Type: application/json' \
   -d '{"text":"New email received","mode":"now"}'
 ```
 
 ```bash
-curl -X POST http://127.0.0.1:18789/hooks/agent \
-  -H 'x-openclaw-token: SECRET' \
+curl -X POST http://127.0.0.1:19789/hooks/agent \
+  -H 'x-clawx-token: SECRET' \
   -H 'Content-Type: application/json' \
   -d '{"message":"Summarize inbox","name":"Email","wakeMode":"next-heartbeat"}'
 ```
@@ -138,8 +138,8 @@ curl -X POST http://127.0.0.1:18789/hooks/agent \
 Add `model` to the agent payload (or mapping) to override the model for that run:
 
 ```bash
-curl -X POST http://127.0.0.1:18789/hooks/agent \
-  -H 'x-openclaw-token: SECRET' \
+curl -X POST http://127.0.0.1:19789/hooks/agent \
+  -H 'x-clawx-token: SECRET' \
   -H 'Content-Type: application/json' \
   -d '{"message":"Summarize inbox","name":"Email","model":"openai/gpt-5.2-mini"}'
 ```
@@ -147,7 +147,7 @@ curl -X POST http://127.0.0.1:18789/hooks/agent \
 If you enforce `agents.defaults.models`, make sure the override model is included there.
 
 ```bash
-curl -X POST http://127.0.0.1:18789/hooks/gmail \
+curl -X POST http://127.0.0.1:19789/hooks/gmail \
   -H 'Authorization: Bearer SECRET' \
   -H 'Content-Type: application/json' \
   -d '{"source":"gmail","messages":[{"from":"Ada","subject":"Hello","snippet":"Hi"}]}'
