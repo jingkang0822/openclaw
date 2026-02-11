@@ -160,6 +160,12 @@ Save to `~/.clawx/clawx.json` and you can DM the bot from that number.
     },
     resetTriggers: ["/new", "/reset"],
     store: "~/.clawx/agents/default/sessions/sessions.json",
+    maintenance: {
+      mode: "warn",
+      pruneAfter: "30d",
+      maxEntries: 500,
+      rotateBytes: "10mb",
+    },
     typingIntervalSeconds: 5,
     sendPolicy: {
       default: "allow",
@@ -344,6 +350,7 @@ Save to `~/.clawx/clawx.json` and you can DM the bot from that number.
     enabled: true,
     store: "~/.clawx/cron/cron.json",
     maxConcurrentRuns: 2,
+    sessionRetention: "24h",
   },
 
   // Webhooks
@@ -377,7 +384,7 @@ Save to `~/.clawx/clawx.json` and you can DM the bot from that number.
       topic: "projects/<project-id>/topics/gog-gmail-watch",
       subscription: "gog-gmail-watch-push",
       pushToken: "shared-push-token",
-      hookUrl: "http://127.0.0.1:19789/hooks/gmail",
+      hookUrl: "http://127.0.0.1:18789/hooks/gmail",
       includeBody: true,
       maxBytes: 20000,
       renewEveryMinutes: 720,
@@ -389,7 +396,7 @@ Save to `~/.clawx/clawx.json` and you can DM the bot from that number.
   // Gateway + networking
   gateway: {
     mode: "local",
-    port: 19789,
+    port: 18789,
     bind: "loopback",
     controlUi: { enabled: true, basePath: "/clawx" },
     auth: {
@@ -398,7 +405,7 @@ Save to `~/.clawx/clawx.json` and you can DM the bot from that number.
       allowTailscale: true,
     },
     tailscale: { mode: "serve", resetOnExit: false },
-    remote: { url: "ws://gateway.tailnet:19789", token: "remote-token" },
+    remote: { url: "ws://gateway.tailnet:18789", token: "remote-token" },
     reload: { mode: "hybrid", debounceMs: 300 },
   },
 

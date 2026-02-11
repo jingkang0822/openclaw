@@ -1,6 +1,6 @@
-import type { ClawXPluginApi } from "../../src/plugins/types.js";
+import type { AnyAgentTool, ClawXPluginApi } from "../../src/plugins/types.js";
 import { createLlmTaskTool } from "./src/llm-task-tool.js";
 
 export default function register(api: ClawXPluginApi) {
-  api.registerTool(createLlmTaskTool(api), { optional: true });
+  api.registerTool(createLlmTaskTool(api) as unknown as AnyAgentTool, { optional: true });
 }

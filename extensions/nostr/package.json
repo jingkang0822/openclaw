@@ -1,10 +1,9 @@
 {
   "name": "@clawx/nostr",
-  "version": "2026.2.6-3",
+  "version": "2026.2.9",
   "description": "ClawX Nostr channel plugin for NIP-04 encrypted DMs",
   "type": "module",
   "dependencies": {
-    "clawx": "workspace:*",
     "nostr-tools": "^2.23.0",
     "zod": "^4.3.6"
   },

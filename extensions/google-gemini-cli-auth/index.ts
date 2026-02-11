@@ -1,4 +1,8 @@
-import { emptyPluginConfigSchema } from "clawx/plugin-sdk";
+import {
+  emptyPluginConfigSchema,
+  type ClawXPluginApi,
+  type ProviderAuthContext,
+} from "clawx/plugin-sdk";
 import { loginGeminiCliOAuth } from "./oauth.js";
 
 const PROVIDER_ID = "google-gemini-cli";
@@ -16,7 +20,7 @@ const geminiCliPlugin = {
   name: "Google Gemini CLI Auth",
   description: "OAuth flow for Gemini CLI (Google Code Assist)",
   configSchema: emptyPluginConfigSchema(),
-  register(api) {
+  register(api: ClawXPluginApi) {
     api.registerProvider({
       id: PROVIDER_ID,
       label: PROVIDER_LABEL,
@@ -29,7 +33,7 @@ const geminiCliPlugin = {
           label: "Google OAuth",
           hint: "PKCE + localhost callback",
           kind: "oauth",
-          run: async (ctx) => {
+          run: async (ctx: ProviderAuthContext) => {
             const spin = ctx.prompter.progress("Starting Gemini CLI OAuth…");
             try {
               const result = await loginGeminiCliOAuth({

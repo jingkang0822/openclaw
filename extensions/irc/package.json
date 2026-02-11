@@ -1,0 +1,14 @@
+{
+  "name": "@clawx/irc",
+  "version": "2026.2.9",
+  "description": "ClawX IRC channel plugin",
+  "type": "module",
+  "devDependencies": {
+    "clawx": "workspace:*"
+  },
+  "clawx": {
+    "extensions": [
+      "./index.ts"
+    ]
+  }
+}

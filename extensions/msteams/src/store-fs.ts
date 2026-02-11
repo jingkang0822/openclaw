@@ -1,3 +1,4 @@
+import { safeParseJson } from "clawx/plugin-sdk";
 import crypto from "node:crypto";
 import fs from "node:fs";
 import path from "node:path";
@@ -13,14 +14,6 @@ const STORE_LOCK_OPTIONS = {
   },
   stale: 30_000,
 } as const;
-
-function safeParseJson<T>(raw: string): T | null {
-  try {
-    return JSON.parse(raw) as T;
-  } catch {
-    return null;
-  }
-}
 
 export async function readJsonFile<T>(
   filePath: string,

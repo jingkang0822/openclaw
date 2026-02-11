@@ -1,10 +1,9 @@
 {
   "name": "@clawx/zalo",
-  "version": "2026.2.6-3",
+  "version": "2026.2.9",
   "description": "ClawX Zalo channel plugin",
   "type": "module",
   "dependencies": {
-    "clawx": "workspace:*",
     "undici": "7.21.0"
   },
   "devDependencies": {

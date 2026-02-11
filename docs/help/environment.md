@@ -74,6 +74,32 @@ You can reference env vars directly in config string values using `${VAR_NAME}` 
 
 See [Configuration: Env var substitution](/gateway/configuration#env-var-substitution-in-config) for full details.
 
+## Path-related env vars
+
+| Variable            | Purpose                                                                                                                                                                    |
+| ------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `CLAWX_HOME`        | Override the home directory used for all internal path resolution (`~/.clawx/`, agent dirs, sessions, credentials). Useful when running ClawX as a dedicated service user. |
+| `CLAWX_STATE_DIR`   | Override the state directory (default `~/.clawx`).                                                                                                                         |
+| `CLAWX_CONFIG_PATH` | Override the config file path (default `~/.clawx/clawx.json`).                                                                                                             |
+
+### `CLAWX_HOME`
+
+When set, `CLAWX_HOME` replaces the system home directory (`$HOME` / `os.homedir()`) for all internal path resolution. This enables full filesystem isolation for headless service accounts.
+
+**Precedence:** `CLAWX_HOME` > `$HOME` > `USERPROFILE` > `os.homedir()`
+
+**Example** (macOS LaunchDaemon):
+
+```xml
+<key>EnvironmentVariables</key>
+<dict>
+  <key>CLAWX_HOME</key>
+  <string>/Users/kira</string>
+</dict>
+```
+
+`CLAWX_HOME` can also be set to a tilde path (e.g. `~/svc`), which gets expanded using `$HOME` before use.
+
 ## Related
 
 - [Gateway configuration](/gateway/configuration)

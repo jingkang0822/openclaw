@@ -1,6 +1,7 @@
 {
   "name": "@clawx/tlon",
-  "version": "2026.2.6-3",
+  "version": "2026.2.9",
+  "private": true,
   "description": "ClawX Tlon/Urbit channel plugin",
   "type": "module",
   "dependencies": {

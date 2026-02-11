@@ -1,4 +1,3 @@
-import os from "node:os";
 import path from "node:path";
 import type { ClawXConfig } from "../config/config.js";
 import { resolveStateDir } from "../config/paths.js";
@@ -8,7 +7,7 @@ import {
   parseAgentSessionKey,
 } from "../routing/session-key.js";
 import { resolveUserPath } from "../utils.js";
-import { DEFAULT_AGENT_WORKSPACE_DIR } from "./workspace.js";
+import { resolveDefaultAgentWorkspaceDir } from "./workspace.js";
 
 export { resolveAgentIdFromSessionKey } from "../routing/session-key.js";
 
@@ -173,9 +172,9 @@ export function resolveAgentWorkspaceDir(cfg: ClawXConfig, agentId: string) {
     if (fallback) {
       return resolveUserPath(fallback);
     }
-    return DEFAULT_AGENT_WORKSPACE_DIR;
+    return resolveDefaultAgentWorkspaceDir(process.env);
   }
-  const stateDir = resolveStateDir(process.env, os.homedir);
+  const stateDir = resolveStateDir(process.env);
   return path.join(stateDir, `workspace-${id}`);
 }
 
@@ -185,6 +184,6 @@ export function resolveAgentDir(cfg: ClawXConfig, agentId: string) {
   if (configured) {
     return resolveUserPath(configured);
   }
-  const root = resolveStateDir(process.env, os.homedir);
+  const root = resolveStateDir(process.env);
   return path.join(root, "agents", id, "agent");
 }

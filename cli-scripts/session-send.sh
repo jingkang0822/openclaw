@@ -1,7 +1,7 @@
 #!/bin/bash
 # Send a message to another agent session via Gateway and wait for the response.
 # Uses chat.send so the conversation is visible in webchat.
-# Automatically prepends sender identity from OPENCLAW_AGENT_ID env var.
+# Automatically prepends sender identity from CLAWX_AGENT_ID env var.
 # Usage: session-send.sh <sessionKey> "<message>"
 # Example: session-send.sh "agent:developer:main" "Please review the latest changes"
 
@@ -16,8 +16,8 @@ if [ -z "$SESSION_KEY" ] || [ -z "$MESSAGE" ]; then
 fi
 
 # Prepend sender identity if available
-if [ -n "$OPENCLAW_AGENT_ID" ]; then
-  MESSAGE="[from:${OPENCLAW_AGENT_ID}] ${MESSAGE}"
+if [ -n "$CLAWX_AGENT_ID" ]; then
+  MESSAGE="[from:${CLAWX_AGENT_ID}] ${MESSAGE}"
 fi
 
 # Escape message for JSON

@@ -33,6 +33,7 @@ struct ClawXApp: App {
 
     init() {
         ClawXLogging.bootstrapIfNeeded()
+
         Self.applyAttachOnlyOverrideIfNeeded()
         _state = State(initialValue: AppStateStore.shared)
     }

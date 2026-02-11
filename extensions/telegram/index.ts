@@ -1,4 +1,4 @@
-import type { ClawXPluginApi } from "clawx/plugin-sdk";
+import type { ChannelPlugin, ClawXPluginApi } from "clawx/plugin-sdk";
 import { emptyPluginConfigSchema } from "clawx/plugin-sdk";
 import { telegramPlugin } from "./src/channel.js";
 import { setTelegramRuntime } from "./src/runtime.js";
@@ -10,7 +10,7 @@ const plugin = {
   configSchema: emptyPluginConfigSchema(),
   register(api: ClawXPluginApi) {
     setTelegramRuntime(api.runtime);
-    api.registerChannel({ plugin: telegramPlugin });
+    api.registerChannel({ plugin: telegramPlugin as ChannelPlugin });
   },
 };
 

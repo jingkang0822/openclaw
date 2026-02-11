@@ -49,6 +49,29 @@ describe("Nix integration (U3, U5, U9)", () => {
       });
     });
 
+    it("STATE_DIR respects CLAWX_HOME when state override is unset", async () => {
+      const customHome = path.join(path.sep, "custom", "home");
+      await withEnvOverride({ CLAWX_HOME: customHome, CLAWX_STATE_DIR: undefined }, async () => {
+        const { STATE_DIR } = await import("./config.js");
+        expect(STATE_DIR).toBe(path.join(path.resolve(customHome), ".clawx"));
+      });
+    });
+
+    it("CONFIG_PATH defaults to CLAWX_HOME/.clawx/clawx.json", async () => {
+      const customHome = path.join(path.sep, "custom", "home");
+      await withEnvOverride(
+        {
+          CLAWX_HOME: customHome,
+          CLAWX_CONFIG_PATH: undefined,
+          CLAWX_STATE_DIR: undefined,
+        },
+        async () => {
+          const { CONFIG_PATH } = await import("./config.js");
+          expect(CONFIG_PATH).toBe(path.join(path.resolve(customHome), ".clawx", "clawx.json"));
+        },
+      );
+    });
+
     it("CONFIG_PATH defaults to ~/.clawx/clawx.json when env not set", async () => {
       await withEnvOverride(
         { CLAWX_CONFIG_PATH: undefined, CLAWX_STATE_DIR: undefined },

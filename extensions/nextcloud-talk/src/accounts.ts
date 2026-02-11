@@ -1,15 +1,6 @@
-import { DEFAULT_ACCOUNT_ID, normalizeAccountId } from "clawx/plugin-sdk";
+import { DEFAULT_ACCOUNT_ID, isTruthyEnvValue, normalizeAccountId } from "clawx/plugin-sdk";
 import { readFileSync } from "node:fs";
 import type { CoreConfig, NextcloudTalkAccountConfig } from "./types.js";
-
-const TRUTHY_ENV = new Set(["true", "1", "yes", "on"]);
-
-function isTruthyEnvValue(value?: string): boolean {
-  if (!value) {
-    return false;
-  }
-  return TRUTHY_ENV.has(value.trim().toLowerCase());
-}
 
 const debugAccounts = (...args: unknown[]) => {
   if (isTruthyEnvValue(process.env.CLAWX_DEBUG_NEXTCLOUD_TALK_ACCOUNTS)) {

@@ -64,7 +64,9 @@ defaults write bot.molt.mac clawx.nixMode -bool true
 ### Config + state paths
 
 ClawX reads JSON5 config from `CLAWX_CONFIG_PATH` and stores mutable data in `CLAWX_STATE_DIR`.
+When needed, you can also set `CLAWX_HOME` to control the base home directory used for internal path resolution.
 
+- `CLAWX_HOME` (default precedence: `HOME` / `USERPROFILE` / `os.homedir()`)
 - `CLAWX_STATE_DIR` (default: `~/.clawx`)
 - `CLAWX_CONFIG_PATH` (default: `$CLAWX_STATE_DIR/clawx.json`)
 

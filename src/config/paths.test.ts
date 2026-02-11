@@ -44,26 +44,52 @@ describe("state + config path candidates", () => {
     expect(resolveStateDir(env, () => "/home/test")).toBe(path.resolve("/new/state"));
   });
 
+  it("uses CLAWX_HOME for default state/config locations", () => {
+    const env = {
+      CLAWX_HOME: "/srv/clawx-home",
+    } as NodeJS.ProcessEnv;
+
+    const resolvedHome = path.resolve("/srv/clawx-home");
+    expect(resolveStateDir(env)).toBe(path.join(resolvedHome, ".clawx"));
+
+    const candidates = resolveDefaultConfigCandidates(env);
+    expect(candidates[0]).toBe(path.join(resolvedHome, ".clawx", "clawx.json"));
+  });
+
+  it("prefers CLAWX_HOME over HOME for default state/config locations", () => {
+    const env = {
+      CLAWX_HOME: "/srv/clawx-home",
+      HOME: "/home/other",
+    } as NodeJS.ProcessEnv;
+
+    const resolvedHome = path.resolve("/srv/clawx-home");
+    expect(resolveStateDir(env)).toBe(path.join(resolvedHome, ".clawx"));
+
+    const candidates = resolveDefaultConfigCandidates(env);
+    expect(candidates[0]).toBe(path.join(resolvedHome, ".clawx", "clawx.json"));
+  });
+
   it("orders default config candidates in a stable order", () => {
     const home = "/home/test";
+    const resolvedHome = path.resolve(home);
     const candidates = resolveDefaultConfigCandidates({} as NodeJS.ProcessEnv, () => home);
     const expected = [
-      path.join(home, ".clawx", "clawx.json"),
-      path.join(home, ".clawx", "clawdbot.json"),
-      path.join(home, ".clawx", "moltbot.json"),
-      path.join(home, ".clawx", "moldbot.json"),
-      path.join(home, ".clawdbot", "clawx.json"),
-      path.join(home, ".clawdbot", "clawdbot.json"),
-      path.join(home, ".clawdbot", "moltbot.json"),
-      path.join(home, ".clawdbot", "moldbot.json"),
-      path.join(home, ".moltbot", "clawx.json"),
-      path.join(home, ".moltbot", "clawdbot.json"),
-      path.join(home, ".moltbot", "moltbot.json"),
-      path.join(home, ".moltbot", "moldbot.json"),
-      path.join(home, ".moldbot", "clawx.json"),
-      path.join(home, ".moldbot", "clawdbot.json"),
-      path.join(home, ".moldbot", "moltbot.json"),
-      path.join(home, ".moldbot", "moldbot.json"),
+      path.join(resolvedHome, ".clawx", "clawx.json"),
+      path.join(resolvedHome, ".clawx", "clawdbot.json"),
+      path.join(resolvedHome, ".clawx", "moltbot.json"),
+      path.join(resolvedHome, ".clawx", "moldbot.json"),
+      path.join(resolvedHome, ".clawdbot", "clawx.json"),
+      path.join(resolvedHome, ".clawdbot", "clawdbot.json"),
+      path.join(resolvedHome, ".clawdbot", "moltbot.json"),
+      path.join(resolvedHome, ".clawdbot", "moldbot.json"),
+      path.join(resolvedHome, ".moltbot", "clawx.json"),
+      path.join(resolvedHome, ".moltbot", "clawdbot.json"),
+      path.join(resolvedHome, ".moltbot", "moltbot.json"),
+      path.join(resolvedHome, ".moltbot", "moldbot.json"),
+      path.join(resolvedHome, ".moldbot", "clawx.json"),
+      path.join(resolvedHome, ".moldbot", "clawdbot.json"),
+      path.join(resolvedHome, ".moldbot", "moltbot.json"),
+      path.join(resolvedHome, ".moldbot", "moldbot.json"),
     ];
     expect(candidates).toEqual(expected);
   });

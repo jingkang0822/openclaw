@@ -5,6 +5,7 @@ import {
   deriveDefaultBrowserControlPort,
   DEFAULT_BROWSER_CONTROL_PORT,
 } from "../config/port-defaults.js";
+import { isLoopbackHost } from "../gateway/net.js";
 import {
   DEFAULT_CLAWX_BROWSER_COLOR,
   DEFAULT_CLAWX_BROWSER_ENABLED,
@@ -41,19 +42,6 @@ export type ResolvedBrowserProfile = {
   color: string;
   driver: "clawx" | "extension";
 };
-
-function isLoopbackHost(host: string) {
-  const h = host.trim().toLowerCase();
-  return (
-    h === "localhost" ||
-    h === "127.0.0.1" ||
-    h === "0.0.0.0" ||
-    h === "[::1]" ||
-    h === "::1" ||
-    h === "[::]" ||
-    h === "::"
-  );
-}
 
 function normalizeHexColor(raw: string | undefined) {
   const value = (raw ?? "").trim();

@@ -1,10 +1,17 @@
-import { describe, expect, it } from "vitest";
+import path from "node:path";
+import { afterEach, describe, expect, it, vi } from "vitest";
 import type { ClawXConfig } from "../config/config.js";
 import {
   resolveAgentConfig,
+  resolveAgentDir,
   resolveAgentModelFallbacksOverride,
   resolveAgentModelPrimary,
+  resolveAgentWorkspaceDir,
 } from "./agent-scope.js";
+
+afterEach(() => {
+  vi.unstubAllEnvs();
+});
 
 describe("resolveAgentConfig", () => {
   it("should return undefined when no agents config exists", () => {
@@ -199,5 +206,23 @@ describe("resolveAgentConfig", () => {
     const result = resolveAgentConfig(cfg, "");
     expect(result).toBeDefined();
     expect(result?.workspace).toBe("~/clawx");
+  });
+
+  it("uses CLAWX_HOME for default agent workspace", () => {
+    const home = path.join(path.sep, "srv", "clawx-home");
+    vi.stubEnv("CLAWX_HOME", home);
+
+    const workspace = resolveAgentWorkspaceDir({} as ClawXConfig, "main");
+    expect(workspace).toBe(path.join(path.resolve(home), ".clawx", "workspace"));
+  });
+
+  it("uses CLAWX_HOME for default agentDir", () => {
+    const home = path.join(path.sep, "srv", "clawx-home");
+    vi.stubEnv("CLAWX_HOME", home);
+    // Clear state dir so it falls back to CLAWX_HOME
+    vi.stubEnv("CLAWX_STATE_DIR", "");
+
+    const agentDir = resolveAgentDir({} as ClawXConfig, "main");
+    expect(agentDir).toBe(path.join(path.resolve(home), ".clawx", "agents", "main", "agent"));
   });
 });

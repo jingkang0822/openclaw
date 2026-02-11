@@ -49,6 +49,16 @@ describe("config io paths", () => {
     });
   });
 
+  it("uses CLAWX_HOME for default config path", async () => {
+    await withTempHome(async (home) => {
+      const io = createConfigIO({
+        env: { CLAWX_HOME: path.join(home, "svc-home") } as NodeJS.ProcessEnv,
+        homedir: () => path.join(home, "ignored-home"),
+      });
+      expect(io.configPath).toBe(path.join(home, "svc-home", ".clawx", "clawx.json"));
+    });
+  });
+
   it("honors explicit CLAWX_CONFIG_PATH override", async () => {
     await withTempHome(async (home) => {
       const customPath = await writeConfig(home, ".clawx", 20002, "custom.json");

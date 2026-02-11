@@ -113,12 +113,10 @@ Docker containers are ephemeral.
 All long-lived state must live on the host.
 
 ```bash
-mkdir -p /root/.clawx
 mkdir -p /root/.clawx/workspace
 
 # Set ownership to the container user (uid 1000):
 chown -R 1000:1000 /root/.clawx
-chown -R 1000:1000 /root/.clawx/workspace
 ```
 
 ---
@@ -131,7 +129,7 @@ Create `.env` in the repository root.
 CLAWX_IMAGE=clawx:latest
 CLAWX_GATEWAY_TOKEN=change-me-now
 CLAWX_GATEWAY_BIND=lan
-CLAWX_GATEWAY_PORT=19789
+CLAWX_GATEWAY_PORT=18789
 
 CLAWX_CONFIG_DIR=/root/.clawx
 CLAWX_WORKSPACE_DIR=/root/.clawx/workspace
@@ -178,7 +176,7 @@ services:
     ports:
       # Recommended: keep the Gateway loopback-only on the VPS; access via SSH tunnel.
       # To expose it publicly, remove the `127.0.0.1:` prefix and firewall accordingly.
-      - "127.0.0.1:${CLAWX_GATEWAY_PORT}:19789"
+      - "127.0.0.1:${CLAWX_GATEWAY_PORT}:18789"
 
       # Optional: only if you run iOS/Android nodes against this VPS and need Canvas host.
       # If you expose this publicly, read /gateway/security and firewall accordingly.
@@ -192,8 +190,11 @@ services:
         "${CLAWX_GATEWAY_BIND}",
         "--port",
         "${CLAWX_GATEWAY_PORT}",
+        "--allow-unconfigured",
       ]
 ```
+
+`--allow-unconfigured` is only for bootstrap convenience, it is not a replacement for a proper gateway configuration. Still set auth (`gateway.auth.token` or password) and use safe bind settings for your deployment.
 
 ---
 
@@ -294,18 +295,18 @@ docker compose logs -f clawx-gateway
 Success:
 
 ```
-[gateway] listening on ws://0.0.0.0:19789
+[gateway] listening on ws://0.0.0.0:18789
 ```
 
 From your laptop:
 
 ```bash
-ssh -N -L 19789:127.0.0.1:19789 root@YOUR_VPS_IP
+ssh -N -L 18789:127.0.0.1:18789 root@YOUR_VPS_IP
 ```
 
 Open:
 
-`http://127.0.0.1:19789/`
+`http://127.0.0.1:18789/`
 
 Paste your gateway token.
 

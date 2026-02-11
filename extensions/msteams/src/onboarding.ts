@@ -4,6 +4,7 @@ import type {
   ClawXConfig,
   DmPolicy,
   WizardPrompter,
+  MSTeamsTeamConfig,
 } from "clawx/plugin-sdk";
 import {
   addWildcardAllowFrom,
@@ -184,7 +185,7 @@ function setMSTeamsTeamsAllowlist(
       msteams: {
         ...cfg.channels?.msteams,
         enabled: true,
-        teams,
+        teams: teams as Record<string, MSTeamsTeamConfig>,
       },
     },
   };

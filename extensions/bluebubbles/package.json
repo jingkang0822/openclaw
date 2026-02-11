@@ -1,6 +1,6 @@
 {
   "name": "@clawx/bluebubbles",
-  "version": "2026.2.6-3",
+  "version": "2026.2.9",
   "description": "ClawX BlueBubbles channel plugin",
   "type": "module",
   "devDependencies": {

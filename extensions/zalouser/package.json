@@ -1,11 +1,10 @@
 {
   "name": "@clawx/zalouser",
-  "version": "2026.2.6-3",
+  "version": "2026.2.9",
   "description": "ClawX Zalo Personal Account plugin via zca-cli",
   "type": "module",
   "dependencies": {
-    "@sinclair/typebox": "0.34.48",
-    "clawx": "workspace:*"
+    "@sinclair/typebox": "0.34.48"
   },
   "devDependencies": {
     "clawx": "workspace:*"

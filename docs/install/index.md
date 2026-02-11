@@ -163,6 +163,14 @@ clawx status         # gateway status
 clawx dashboard      # open the browser UI
 ```
 
+If you need custom runtime paths, use:
+
+- `CLAWX_HOME` for home-directory based internal paths
+- `CLAWX_STATE_DIR` for mutable state location
+- `CLAWX_CONFIG_PATH` for config file location
+
+See [Environment vars](/help/environment) for precedence and full details.
+
 ## Troubleshooting: `clawx` not found
 
 <Accordion title="PATH diagnosis and fix">

@@ -55,7 +55,7 @@ describe("applyCliProfileEnv", () => {
       env,
       homedir: () => "/home/peter",
     });
-    const expectedStateDir = path.join("/home/peter", ".clawx-dev");
+    const expectedStateDir = path.join(path.resolve("/home/peter"), ".clawx-dev");
     expect(env.CLAWX_PROFILE).toBe("dev");
     expect(env.CLAWX_STATE_DIR).toBe(expectedStateDir);
     expect(env.CLAWX_CONFIG_PATH).toBe(path.join(expectedStateDir, "clawx.json"));
@@ -75,6 +75,22 @@ describe("applyCliProfileEnv", () => {
     expect(env.CLAWX_STATE_DIR).toBe("/custom");
     expect(env.CLAWX_GATEWAY_PORT).toBe("19099");
     expect(env.CLAWX_CONFIG_PATH).toBe(path.join("/custom", "clawx.json"));
+  });
+
+  it("uses CLAWX_HOME when deriving profile state dir", () => {
+    const env: Record<string, string | undefined> = {
+      CLAWX_HOME: "/srv/clawx-home",
+      HOME: "/home/other",
+    };
+    applyCliProfileEnv({
+      profile: "work",
+      env,
+      homedir: () => "/home/fallback",
+    });
+
+    const resolvedHome = path.resolve("/srv/clawx-home");
+    expect(env.CLAWX_STATE_DIR).toBe(path.join(resolvedHome, ".clawx-work"));
+    expect(env.CLAWX_CONFIG_PATH).toBe(path.join(resolvedHome, ".clawx-work", "clawx.json"));
   });
 });
 

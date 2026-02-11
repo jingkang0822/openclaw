@@ -96,6 +96,16 @@ If the Control UI loads, your Gateway is ready for use.
   </Accordion>
 </AccordionGroup>
 
+## Useful environment variables
+
+If you run ClawX as a service account or want custom config/state locations:
+
+- `CLAWX_HOME` sets the home directory used for internal path resolution.
+- `CLAWX_STATE_DIR` overrides the state directory.
+- `CLAWX_CONFIG_PATH` overrides the config file path.
+
+Full environment variable reference: [Environment vars](/help/environment).
+
 ## Go deeper
 
 <Columns>

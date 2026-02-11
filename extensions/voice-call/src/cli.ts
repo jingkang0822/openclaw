@@ -1,4 +1,5 @@
 import type { Command } from "commander";
+import { sleep } from "clawx/plugin-sdk";
 import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
@@ -38,10 +39,6 @@ function resolveDefaultStorePath(config: VoiceCallConfig): string {
     }) ?? resolvedPreferred;
   const base = config.store?.trim() ? resolveUserPath(config.store) : existing;
   return path.join(base, "calls.jsonl");
-}
-
-function sleep(ms: number): Promise<void> {
-  return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
 export function registerVoiceCallCli(params: {

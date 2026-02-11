@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * OpenClaw Gateway JSON-RPC client for CLI agents.
+ * ClawX Gateway JSON-RPC client for CLI agents.
  * Uses Node.js native WebSocket (v22+), no external dependencies.
  *
  * Usage:
@@ -17,7 +17,7 @@ import { readFileSync } from "node:fs";
 import { join } from "node:path";
 
 // Load config
-const configPath = join(process.env.HOME || process.env.USERPROFILE, ".openclaw", "openclaw.json");
+const configPath = join(process.env.HOME || process.env.USERPROFILE, ".clawx", "clawx.json");
 const config = JSON.parse(readFileSync(configPath, "utf8"));
 const port = config.gateway?.port ?? 18789;
 const token = config.gateway?.auth?.token ?? "";

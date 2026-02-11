@@ -10,8 +10,11 @@ import {
   normalizeE164,
   normalizePath,
   resolveConfigDir,
+  resolveHomeDir,
   resolveJidToE164,
   resolveUserPath,
+  shortenHomeInString,
+  shortenHomePath,
   sleep,
   toWhatsappJid,
   withWhatsAppPrefix,
@@ -134,6 +137,43 @@ describe("resolveConfigDir", () => {
   });
 });
 
+describe("resolveHomeDir", () => {
+  it("prefers CLAWX_HOME over HOME", () => {
+    vi.stubEnv("CLAWX_HOME", "/srv/clawx-home");
+    vi.stubEnv("HOME", "/home/other");
+
+    expect(resolveHomeDir()).toBe(path.resolve("/srv/clawx-home"));
+
+    vi.unstubAllEnvs();
+  });
+});
+
+describe("shortenHomePath", () => {
+  it("uses $CLAWX_HOME prefix when CLAWX_HOME is set", () => {
+    vi.stubEnv("CLAWX_HOME", "/srv/clawx-home");
+    vi.stubEnv("HOME", "/home/other");
+
+    expect(shortenHomePath(`${path.resolve("/srv/clawx-home")}/.clawx/clawx.json`)).toBe(
+      "$CLAWX_HOME/.clawx/clawx.json",
+    );
+
+    vi.unstubAllEnvs();
+  });
+});
+
+describe("shortenHomeInString", () => {
+  it("uses $CLAWX_HOME replacement when CLAWX_HOME is set", () => {
+    vi.stubEnv("CLAWX_HOME", "/srv/clawx-home");
+    vi.stubEnv("HOME", "/home/other");
+
+    expect(
+      shortenHomeInString(`config: ${path.resolve("/srv/clawx-home")}/.clawx/clawx.json`),
+    ).toBe("config: $CLAWX_HOME/.clawx/clawx.json");
+
+    vi.unstubAllEnvs();
+  });
+});
+
 describe("resolveJidToE164", () => {
   it("resolves @lid via lidLookup when mapping file is missing", async () => {
     const lidLookup = {
@@ -163,6 +203,15 @@ describe("resolveUserPath", () => {
 
   it("resolves relative paths", () => {
     expect(resolveUserPath("tmp/dir")).toBe(path.resolve("tmp/dir"));
+  });
+
+  it("prefers CLAWX_HOME for tilde expansion", () => {
+    vi.stubEnv("CLAWX_HOME", "/srv/clawx-home");
+    vi.stubEnv("HOME", "/home/other");
+
+    expect(resolveUserPath("~/clawx")).toBe(path.resolve("/srv/clawx-home", "clawx"));
+
+    vi.unstubAllEnvs();
   });
 
   it("keeps blank paths blank", () => {

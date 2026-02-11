@@ -5,6 +5,8 @@ import type {
   GroupPolicy,
 } from "clawx/plugin-sdk";
 
+export type { DmPolicy, GroupPolicy };
+
 export type NextcloudTalkRoomConfig = {
   requireMention?: boolean;
   /** Optional tool policy overrides for this room. */

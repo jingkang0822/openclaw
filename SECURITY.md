@@ -4,8 +4,35 @@ If you believe you've found a security issue in ClawX, please report it privatel
 
 ## Reporting
 
-- Email: `steipete@gmail.com`
-- What to include: reproduction steps, impact assessment, and (if possible) a minimal PoC.
+Report vulnerabilities directly to the repository where the issue lives:
+
+- **Core CLI and gateway** — [clawx/clawx](https://github.com/clawx/clawx)
+- **macOS desktop app** — [clawx/clawx](https://github.com/clawx/clawx) (apps/macos)
+- **iOS app** — [clawx/clawx](https://github.com/clawx/clawx) (apps/ios)
+- **Android app** — [clawx/clawx](https://github.com/clawx/clawx) (apps/android)
+- **ClawHub** — [clawx/clawhub](https://github.com/clawx/clawhub)
+- **Trust and threat model** — [clawx/trust](https://github.com/clawx/trust)
+
+For issues that don't fit a specific repo, or if you're unsure, email **security@clawx.ai** and we'll route it.
+
+For full reporting instructions see our [Trust page](https://trust.clawx.ai).
+
+### Required in Reports
+
+1. **Title**
+2. **Severity Assessment**
+3. **Impact**
+4. **Affected Component**
+5. **Technical Reproduction**
+6. **Demonstrated Impact**
+7. **Environment**
+8. **Remediation Advice**
+
+Reports without reproduction steps, demonstrated impact, and remediation advice will be deprioritized. Given the volume of AI-generated scanner findings, we must ensure we're receiving vetted reports from researchers who understand the issues.
+
+## Security & Trust
+
+**Jamieson O'Reilly** ([@theonejvo](https://twitter.com/theonejvo)) is Security & Trust at ClawX. Jamieson is the founder of [Dvuln](https://dvuln.com) and brings extensive experience in offensive security, penetration testing, and security program development.
 
 ## Bug Bounties
 
