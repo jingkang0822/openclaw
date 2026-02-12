@@ -198,9 +198,11 @@ export async function startGatewayServer(
             .map((issue) => `${issue.path || "<root>"}: ${issue.message}`)
             .join("\n")
         : "Unknown validation issue.";
-    throw new Error(
+    const configError = new Error(
       `Invalid config at ${configSnapshot.path}.\n${issues}\nRun "${formatCliCommand("clawx doctor")}" to repair, then retry.`,
     );
+    (configError as { code?: string }).code = "INVALID_CONFIG";
+    throw configError;
   }
 
   const autoEnable = applyPluginAutoEnable({ config: configSnapshot.config, env: process.env });

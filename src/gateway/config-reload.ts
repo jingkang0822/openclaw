@@ -294,9 +294,13 @@ export function startGatewayConfigReloader(opts: {
     try {
       const snapshot = await opts.readSnapshot();
       if (!snapshot.valid) {
-        const issues = snapshot.issues.map((issue) => `${issue.path}: ${issue.message}`).join(", ");
-        opts.log.warn(`config reload skipped (invalid config): ${issues}`);
-        return;
+        const issues = snapshot.issues
+          .map((issue) => `  - ${issue.path}: ${issue.message}`)
+          .join("\n");
+        opts.log.error(
+          `Invalid config detected during reload:\n${issues}\nExiting. Run "clawx doctor --fix" to repair.`,
+        );
+        process.exit(1);
       }
       const nextConfig = snapshot.config;
       const changedPaths = diffConfigPaths(currentConfig, nextConfig);
