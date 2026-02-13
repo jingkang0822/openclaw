@@ -39,6 +39,14 @@ export function listTelegramAccountIds(cfg: ClawXConfig): string[] {
   const ids = Array.from(
     new Set([...listConfiguredAccountIds(cfg), ...listBoundAccountIds(cfg, "telegram")]),
   );
+  // The default account uses the top-level botToken/tokenFile rather than an
+  // entry inside `accounts`, so it won't appear in listConfiguredAccountIds.
+  // Include it whenever a top-level token source is configured.
+  const tg = cfg.channels?.telegram;
+  const hasDefaultToken = Boolean(tg?.botToken?.trim() || tg?.tokenFile?.trim());
+  if (hasDefaultToken && !ids.includes(DEFAULT_ACCOUNT_ID)) {
+    ids.push(DEFAULT_ACCOUNT_ID);
+  }
   debugAccounts("listTelegramAccountIds", ids);
   if (ids.length === 0) {
     return [DEFAULT_ACCOUNT_ID];

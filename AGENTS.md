@@ -44,8 +44,8 @@
 - Config: use `clawx config set ...`; ensure `gateway.mode=local` is set.
 - Discord: store raw token only (no `DISCORD_BOT_TOKEN=` prefix).
 - Restart: stop old gateway and run:
-  `pkill -9 -f clawx-gateway || true; nohup clawx gateway run --bind loopback --port 18789 --force > /tmp/clawx-gateway.log 2>&1 &`
-- Verify: `clawx channels status --probe`, `ss -ltnp | rg 18789`, `tail -n 120 /tmp/clawx-gateway.log`.
+  `pkill -9 -f clawx-gateway || true; nohup clawx gateway run --bind loopback --port 19789 --force > /tmp/clawx-gateway.log 2>&1 &`
+- Verify: `clawx channels status --probe`, `ss -ltnp | rg 19789`, `tail -n 120 /tmp/clawx-gateway.log`.
 
 ## Build, Test, and Development Commands
 

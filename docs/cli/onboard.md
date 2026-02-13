@@ -23,7 +23,7 @@ Interactive onboarding wizard (local or remote Gateway setup).
 clawx onboard
 clawx onboard --flow quickstart
 clawx onboard --flow manual
-clawx onboard --mode remote --remote-url ws://gateway-host:18789
+clawx onboard --mode remote --remote-url ws://gateway-host:19789
 ```
 
 Flow notes:

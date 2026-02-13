@@ -2,6 +2,7 @@ import type { ImageContent } from "@mariozechner/pi-ai";
 import type { ThinkLevel } from "../auto-reply/thinking.js";
 import type { ClawXConfig } from "../config/config.js";
 import type { EmbeddedPiRunResult } from "./pi-embedded-runner.js";
+import type { SkillSnapshot } from "./skills/types.js";
 import { resolveHeartbeatPrompt } from "../auto-reply/heartbeat.js";
 import { shouldLogVerbose } from "../globals.js";
 import { isTruthyEnvValue } from "../infra/env.js";
@@ -28,6 +29,8 @@ import {
 import { resolveClawXDocsPath } from "./docs-path.js";
 import { FailoverError, resolveFailoverStatus } from "./failover-error.js";
 import { classifyFailoverReason, isFailoverErrorMessage } from "./pi-embedded-helpers.js";
+import { applySkillEnvOverridesFromSnapshot } from "./skills/env-overrides.js";
+import { resolveSkillsPromptForRun } from "./skills/workspace.js";
 import { redactRunIdentifier, resolveRunWorkspaceDir } from "./workspace-run.js";
 
 const log = createSubsystemLogger("agent/claude-cli");
@@ -50,6 +53,7 @@ export async function runCliAgent(params: {
   ownerNumbers?: string[];
   cliSessionId?: string;
   images?: ImageContent[];
+  skillsSnapshot?: SkillSnapshot;
 }): Promise<EmbeddedPiRunResult> {
   const started = Date.now();
   const workspaceResolution = resolveRunWorkspaceDir({
@@ -117,6 +121,15 @@ export async function runCliAgent(params: {
     cwd: process.cwd(),
     moduleUrl: import.meta.url,
   });
+  const restoreSkillEnv = applySkillEnvOverridesFromSnapshot({
+    snapshot: params.skillsSnapshot,
+    config: params.config,
+  });
+  const skillsPrompt = resolveSkillsPromptForRun({
+    skillsSnapshot: params.skillsSnapshot,
+    config: params.config,
+    workspaceDir,
+  });
   const systemPrompt = buildSystemPrompt({
     workspaceDir,
     config: params.config,
@@ -129,6 +142,7 @@ export async function runCliAgent(params: {
     contextFiles,
     modelDisplay,
     agentId: sessionAgentId,
+    skillsPrompt: skillsPrompt || undefined,
   });
 
   const { sessionId: cliSessionIdToSend, isNew } = resolveSessionIdToSend({
@@ -330,6 +344,7 @@ export async function runCliAgent(params: {
     }
     throw err;
   } finally {
+    restoreSkillEnv();
     if (cleanupImages) {
       await cleanupImages();
     }

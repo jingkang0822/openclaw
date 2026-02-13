@@ -391,6 +391,7 @@ export async function runCronIsolatedAgentTurn(params: {
             timeoutMs,
             runId: cronSession.sessionEntry.sessionId,
             cliSessionId,
+            skillsSnapshot,
           });
         }
         return runEmbeddedPiAgent({

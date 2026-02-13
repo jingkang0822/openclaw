@@ -3,13 +3,15 @@ import fs from "node:fs";
 import path from "node:path";
 import type { MsgContext } from "../../auto-reply/templating.js";
 import type { GatewayRequestContext, GatewayRequestHandlers } from "./types.js";
-import { resolveSessionAgentId } from "../../agents/agent-scope.js";
+import { resolveDefaultAgentId, resolveSessionAgentId } from "../../agents/agent-scope.js";
 import { resolveThinkingDefault } from "../../agents/model-selection.js";
 import { resolveAgentTimeoutMs } from "../../agents/timeout.js";
 import { dispatchInboundMessage } from "../../auto-reply/dispatch.js";
 import { createReplyDispatcher } from "../../auto-reply/reply/reply-dispatcher.js";
 import { isRoutableChannel, routeReply } from "../../auto-reply/reply/route-reply.js";
 import { createReplyPrefixOptions } from "../../channels/reply-prefix.js";
+import { listBindings } from "../../routing/bindings.js";
+import { normalizeAgentId, resolveAgentIdFromSessionKey } from "../../routing/session-key.js";
 import { resolveSendPolicy } from "../../sessions/send-policy.js";
 import { INTERNAL_MESSAGE_CHANNEL } from "../../utils/message-channel.js";
 import {
@@ -387,11 +389,67 @@ export const chatHandlers: GatewayRequestHandlers = {
     }
     const rawSessionKey = p.sessionKey;
     const { cfg, entry, canonicalKey: sessionKey } = loadSessionEntry(rawSessionKey);
-    const externalOrigin = entry?.origin;
+    // Cross-delivery: forward webchat messages to the external channel.
+    // 1. Use session origin if routable (stable — webchat never overwrites it).
+    // 2. Otherwise derive from agent's channel binding in config so cross-delivery
+    //    works even for new sessions that never received an inbound TG message.
+    //    The "to" (user's chat ID) comes from session fields (origin > lastTo).
+    let externalOrigin = entry?.origin;
+    if (!isRoutableChannel(externalOrigin?.provider)) {
+      const agentId = resolveAgentIdFromSessionKey(sessionKey);
+      // Look for an explicit binding (e.g., life → telegram:life).
+      const binding = listBindings(cfg).find(
+        (b) => normalizeAgentId(b.agentId) === agentId && isRoutableChannel(b.match?.channel),
+      );
+      let bindingChannel = binding?.match?.channel;
+      let bindingAccountId = binding?.match?.accountId;
+      // Default agent with no explicit binding → use the default TG account
+      // if telegram is enabled (handles CTO agent).
+      if (!bindingChannel && normalizeAgentId(resolveDefaultAgentId(cfg)) === agentId) {
+        const tgEnabled = cfg.channels?.telegram?.enabled !== false;
+        const hasDefaultToken = Boolean(
+          cfg.channels?.telegram?.botToken?.trim() || cfg.channels?.telegram?.tokenFile?.trim(),
+        );
+        if (tgEnabled && hasDefaultToken) {
+          bindingChannel = "telegram";
+          bindingAccountId = "default";
+        }
+      }
+      // Resolve "to" (user's chat ID). Prefer session origin/lastTo, fall back
+      // to the static binding.to from config (e.g., default cross-delivery target).
+      let to = entry?.origin?.to ?? entry?.lastTo ?? binding?.to;
+      if (to && bindingChannel && to.startsWith(`${bindingChannel}:`)) {
+        to = to.slice(bindingChannel.length + 1);
+      }
+      if (bindingChannel && to) {
+        externalOrigin = {
+          provider: bindingChannel,
+          to,
+          accountId: bindingAccountId,
+        };
+      }
+    }
+    // Strip channel prefix from "to" if present (e.g., "telegram:1781823012" → "1781823012").
+    if (
+      externalOrigin?.to &&
+      externalOrigin.provider &&
+      externalOrigin.to.startsWith(`${externalOrigin.provider}:`)
+    ) {
+      externalOrigin = {
+        ...externalOrigin,
+        to: externalOrigin.to.slice(externalOrigin.provider.length + 1),
+      };
+    }
     const shouldForwardToOrigin =
       isRoutableChannel(externalOrigin?.provider) &&
       typeof externalOrigin?.to === "string" &&
       externalOrigin.to.length > 0;
+
+    context.logGateway.info(
+      `[cross-delivery] sessionKey=${sessionKey} origin=${JSON.stringify(entry?.origin ?? null)} ` +
+        `lastTo=${entry?.lastTo ?? "null"} ` +
+        `resolved=${JSON.stringify(externalOrigin ?? null)} shouldForward=${shouldForwardToOrigin}`,
+    );
 
     const timeoutMs = resolveAgentTimeoutMs({
       cfg,
@@ -524,6 +582,9 @@ export const chatHandlers: GatewayRequestHandlers = {
       });
 
       if (shouldForwardToOrigin && externalOrigin) {
+        context.logGateway.info(
+          `[cross-delivery] forwarding user msg to ${externalOrigin.provider}/${externalOrigin.to}`,
+        );
         void routeReply({
           payload: { text: `[💬] ${parsedMessage}` },
           channel: externalOrigin.provider!,
@@ -571,12 +632,12 @@ export const chatHandlers: GatewayRequestHandlers = {
         },
       })
         .then(() => {
+          const combinedReply = finalReplyParts
+            .map((part) => part.trim())
+            .filter(Boolean)
+            .join("\n\n")
+            .trim();
           if (!agentRunStarted) {
-            const combinedReply = finalReplyParts
-              .map((part) => part.trim())
-              .filter(Boolean)
-              .join("\n\n")
-              .trim();
             let message: Record<string, unknown> | undefined;
             if (combinedReply) {
               const { storePath: latestStorePath, entry: latestEntry } =
@@ -613,22 +674,27 @@ export const chatHandlers: GatewayRequestHandlers = {
               sessionKey: rawSessionKey,
               message,
             });
-            if (shouldForwardToOrigin && externalOrigin && combinedReply) {
-              void routeReply({
-                payload: { text: combinedReply },
-                channel: externalOrigin.provider!,
-                to: externalOrigin.to!,
-                accountId: externalOrigin.accountId,
-                threadId: externalOrigin.threadId,
-                sessionKey,
-                cfg,
-                mirror: false,
-              }).catch((err) => {
-                context.logGateway.warn(
-                  `webchat->external forward (reply) failed: ${formatForLog(err)}`,
-                );
-              });
-            }
+          }
+          // Cross-deliver reply to external channel (outside agentRunStarted guard
+          // so it works for both CLI and embedded/API runners).
+          if (shouldForwardToOrigin && externalOrigin && combinedReply) {
+            context.logGateway.info(
+              `[cross-delivery] forwarding reply (${combinedReply.length} chars) to ${externalOrigin.provider}/${externalOrigin.to}`,
+            );
+            void routeReply({
+              payload: { text: combinedReply },
+              channel: externalOrigin.provider!,
+              to: externalOrigin.to!,
+              accountId: externalOrigin.accountId,
+              threadId: externalOrigin.threadId,
+              sessionKey,
+              cfg,
+              mirror: false,
+            }).catch((err) => {
+              context.logGateway.warn(
+                `webchat->external forward (reply) failed: ${formatForLog(err)}`,
+              );
+            });
           }
           context.dedupe.set(`chat:${clientRunId}`, {
             ts: Date.now(),

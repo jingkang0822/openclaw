@@ -1,4 +1,5 @@
 import process from "node:process";
+import { isFailoverError } from "../agents/failover-error.js";
 import { extractErrorCode, formatUncaughtError } from "./errors.js";
 
 type UnhandledRejectionHandler = (reason: unknown) => boolean;
@@ -168,6 +169,16 @@ export function installUnhandledRejectionHandler(): void {
     if (isTransientNetworkError(reason)) {
       console.warn(
         "[clawx] Non-fatal unhandled rejection (continuing):",
+        formatUncaughtError(reason),
+      );
+      return;
+    }
+
+    // FailoverError from agent/CLI execution is recoverable — don't crash the gateway.
+    // These escape the reply pipeline when the try block in agent-runner has no catch clause.
+    if (isFailoverError(reason)) {
+      console.warn(
+        `[clawx] Suppressed FailoverError (reason=${reason.reason}, provider=${reason.provider ?? "?"}, model=${reason.model ?? "?"}):`,
         formatUncaughtError(reason),
       );
       return;

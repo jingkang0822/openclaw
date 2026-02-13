@@ -408,6 +408,7 @@ export async function agentCommand(
               cliSessionId,
               images: opts.images,
               streamParams: opts.streamParams,
+              skillsSnapshot,
             });
           }
           const authProfileId =

@@ -518,6 +518,15 @@ export async function runReplyAgent(params: {
       queueKey,
       runFollowupTurn,
     );
+  } catch (err) {
+    const label = err instanceof Error ? `${err.name}: ${err.message}` : String(err);
+    console.error(
+      `[agent-runner] Unhandled error in reply pipeline (session=${sessionKey ?? "?"}, isHeartbeat=${isHeartbeat}):`,
+      label,
+    );
+    // Re-throw so the global unhandledRejection handler can classify it
+    // (e.g., FailoverError is now suppressed instead of crashing the gateway).
+    throw err;
   } finally {
     blockReplyPipeline?.stop();
     typing.markRunComplete();

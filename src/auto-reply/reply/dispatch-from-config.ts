@@ -448,6 +448,8 @@ export async function dispatchReplyFromConfig(params: {
     markIdle("message_completed");
     return { queuedFinal, counts };
   } catch (err) {
+    const label = err instanceof Error ? `${err.name}: ${err.message}` : String(err);
+    console.error(`[dispatch] Reply pipeline error: ${label}`);
     recordProcessed("error", { error: String(err) });
     markIdle("message_error");
     throw err;

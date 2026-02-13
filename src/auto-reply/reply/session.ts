@@ -240,11 +240,15 @@ export async function initSessionState(params: {
   }
 
   const baseEntry = !isNewSession && freshEntry ? entry : undefined;
+  // On /new, preserve routing metadata (origin, lastTo, etc.) from the previous
+  // entry so cross-delivery keeps working without requiring a new TG message.
+  const routingEntry = baseEntry ?? (isNewSession && entry ? entry : undefined);
   // Track the originating channel/to for announce routing (subagent announce-back).
-  const lastChannelRaw = (ctx.OriginatingChannel as string | undefined) || baseEntry?.lastChannel;
-  const lastToRaw = ctx.OriginatingTo || ctx.To || baseEntry?.lastTo;
-  const lastAccountIdRaw = ctx.AccountId || baseEntry?.lastAccountId;
-  const lastThreadIdRaw = ctx.MessageThreadId || baseEntry?.lastThreadId;
+  const lastChannelRaw =
+    (ctx.OriginatingChannel as string | undefined) || routingEntry?.lastChannel;
+  const lastToRaw = ctx.OriginatingTo || ctx.To || routingEntry?.lastTo;
+  const lastAccountIdRaw = ctx.AccountId || routingEntry?.lastAccountId;
+  const lastThreadIdRaw = ctx.MessageThreadId || routingEntry?.lastThreadId;
   const deliveryFields = normalizeSessionDeliveryFields({
     deliveryContext: {
       channel: lastChannelRaw,
@@ -283,6 +287,9 @@ export async function initSessionState(params: {
     subject: baseEntry?.subject,
     groupChannel: baseEntry?.groupChannel,
     space: baseEntry?.space,
+    // Carry forward origin from previous session on /new so cross-delivery
+    // keeps working (origin is about the user's channel, not conversation state).
+    origin: baseEntry?.origin ?? routingEntry?.origin,
     deliveryContext: deliveryFields.deliveryContext,
     // Track originating channel for subagent announce routing.
     lastChannel,

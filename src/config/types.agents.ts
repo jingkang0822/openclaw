@@ -79,4 +79,6 @@ export type AgentBinding = {
     guildId?: string;
     teamId?: string;
   };
+  /** Default cross-delivery target (e.g., TG chat ID) when no session origin exists. */
+  to?: string;
 };

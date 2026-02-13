@@ -19,7 +19,7 @@ import { join } from "node:path";
 // Load config
 const configPath = join(process.env.HOME || process.env.USERPROFILE, ".clawx", "clawx.json");
 const config = JSON.parse(readFileSync(configPath, "utf8"));
-const port = config.gateway?.port ?? 18789;
+const port = config.gateway?.port ?? 19789;
 const token = config.gateway?.auth?.token ?? "";
 
 const method = process.argv[2];

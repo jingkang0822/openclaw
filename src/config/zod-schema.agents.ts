@@ -37,6 +37,7 @@ export const BindingsSchema = z
             teamId: z.string().optional(),
           })
           .strict(),
+        to: z.string().optional(),
       })
       .strict(),
   )

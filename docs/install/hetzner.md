@@ -129,7 +129,7 @@ Create `.env` in the repository root.
 CLAWX_IMAGE=clawx:latest
 CLAWX_GATEWAY_TOKEN=change-me-now
 CLAWX_GATEWAY_BIND=lan
-CLAWX_GATEWAY_PORT=18789
+CLAWX_GATEWAY_PORT=19789
 
 CLAWX_CONFIG_DIR=/root/.clawx
 CLAWX_WORKSPACE_DIR=/root/.clawx/workspace
@@ -176,7 +176,7 @@ services:
     ports:
       # Recommended: keep the Gateway loopback-only on the VPS; access via SSH tunnel.
       # To expose it publicly, remove the `127.0.0.1:` prefix and firewall accordingly.
-      - "127.0.0.1:${CLAWX_GATEWAY_PORT}:18789"
+      - "127.0.0.1:${CLAWX_GATEWAY_PORT}:19789"
 
       # Optional: only if you run iOS/Android nodes against this VPS and need Canvas host.
       # If you expose this publicly, read /gateway/security and firewall accordingly.
@@ -295,18 +295,18 @@ docker compose logs -f clawx-gateway
 Success:
 
 ```
-[gateway] listening on ws://0.0.0.0:18789
+[gateway] listening on ws://0.0.0.0:19789
 ```
 
 From your laptop:
 
 ```bash
-ssh -N -L 18789:127.0.0.1:18789 root@YOUR_VPS_IP
+ssh -N -L 19789:127.0.0.1:19789 root@YOUR_VPS_IP
 ```
 
 Open:
 
-`http://127.0.0.1:18789/`
+`http://127.0.0.1:19789/`
 
 Paste your gateway token.
 

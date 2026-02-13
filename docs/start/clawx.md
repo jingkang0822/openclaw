@@ -68,7 +68,7 @@ clawx channels login
 2. Start the Gateway (leave it running):
 
 ```bash
-clawx gateway --port 18789
+clawx gateway --port 19789
 ```
 
 3. Put a minimal config in `~/.clawx/clawx.json`:

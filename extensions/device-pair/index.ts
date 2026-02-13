@@ -2,7 +2,7 @@ import type { ClawXPluginApi } from "clawx/plugin-sdk";
 import { approveDevicePairing, listDevicePairing } from "clawx/plugin-sdk";
 import os from "node:os";
 
-const DEFAULT_GATEWAY_PORT = 18789;
+const DEFAULT_GATEWAY_PORT = 19789;
 
 type DevicePairPluginConfig = {
   publicUrl?: string;

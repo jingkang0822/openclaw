@@ -175,6 +175,25 @@ export async function runAgentTurnWithFallback(params: {
               },
             });
             const cliSessionId = getCliSessionId(params.getActiveSessionEntry(), provider);
+            // Resolve session info upfront so we can write transcript before AND after execution.
+            const cliSessionEntry = params.getActiveSessionEntry();
+            const cliSessionId_ = cliSessionEntry?.sessionId ?? params.followupRun.run.sessionId;
+            const cliSessionFile =
+              cliSessionEntry?.sessionFile ?? params.followupRun.run.sessionFile;
+
+            // Write user message to transcript BEFORE CLI execution.
+            // This ensures the user's message is persisted even if the agent times out or errors.
+            if (params.sessionKey) {
+              appendTranscriptMessage({
+                message: params.commandBody,
+                role: "user",
+                sessionId: cliSessionId_,
+                storePath: params.storePath,
+                sessionFile: cliSessionFile,
+                createIfMissing: true,
+              });
+            }
+
             return (async () => {
               let lifecycleTerminalEmitted = false;
               try {
@@ -195,6 +214,7 @@ export async function runAgentTurnWithFallback(params: {
                   ownerNumbers: params.followupRun.run.ownerNumbers,
                   cliSessionId,
                   images: params.opts?.images,
+                  skillsSnapshot: params.followupRun.run.skillsSnapshot,
                 });
 
                 // CLI backends don't emit streaming assistant events, so we need to
@@ -208,27 +228,14 @@ export async function runAgentTurnWithFallback(params: {
                     data: { text: cliText },
                   });
 
-                  // Write user + assistant to session transcript for CLI backends.
-                  // Embedded providers use SessionManager which handles this automatically.
+                  // Write assistant response to transcript (user message already written above).
                   if (params.sessionKey) {
-                    const sessionEntry = params.getActiveSessionEntry();
-                    const sessionId = sessionEntry?.sessionId ?? params.followupRun.run.sessionId;
-                    const sessionFile =
-                      sessionEntry?.sessionFile ?? params.followupRun.run.sessionFile;
-                    appendTranscriptMessage({
-                      message: params.commandBody,
-                      role: "user",
-                      sessionId,
-                      storePath: params.storePath,
-                      sessionFile,
-                      createIfMissing: true,
-                    });
                     appendTranscriptMessage({
                       message: cliText,
                       role: "assistant",
-                      sessionId,
+                      sessionId: cliSessionId_,
                       storePath: params.storePath,
-                      sessionFile,
+                      sessionFile: cliSessionFile,
                     });
                   }
                 }
@@ -246,6 +253,30 @@ export async function runAgentTurnWithFallback(params: {
 
                 return result;
               } catch (err) {
+                // Write error/timeout as assistant message so the conversation is not lost on reload.
+                const errMsg = String(err);
+                const isTimeout = /timeout|timed out|deadline exceeded/i.test(errMsg);
+                const errorText = isTimeout
+                  ? "⏱️ Agent request timed out. Your message has been saved; please try again."
+                  : `⚠️ Agent error: ${errMsg}`;
+
+                // Emit assistant event so server-chat can populate its buffer
+                // and deliver the error to webchat/TG clients (mirrors success path).
+                emitAgentEvent({
+                  runId,
+                  stream: "assistant",
+                  data: { text: errorText },
+                });
+
+                if (params.sessionKey) {
+                  appendTranscriptMessage({
+                    message: errorText,
+                    role: "assistant",
+                    sessionId: cliSessionId_,
+                    storePath: params.storePath,
+                    sessionFile: cliSessionFile,
+                  });
+                }
                 emitAgentEvent({
                   runId,
                   stream: "lifecycle",
