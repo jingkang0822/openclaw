@@ -3,7 +3,7 @@ import { repeat } from "lit/directives/repeat.js";
 import type { AppViewState } from "./app-view-state.ts";
 import type { ThemeTransitionContext } from "./theme-transition.ts";
 import type { ThemeMode } from "./theme.ts";
-import type { SessionsListResult } from "./types.ts";
+import type { AgentsListResult, SessionsListResult } from "./types.ts";
 import { refreshChat } from "./app-chat.ts";
 import { syncUrlWithSessionKey } from "./app-settings.ts";
 import { ClawXApp } from "./app.ts";
@@ -45,6 +45,7 @@ export function renderChatControls(state: AppViewState) {
     state.sessionKey,
     state.sessionsResult,
     mainSessionKey,
+    state.agentsList,
   );
   const disableThinkingToggle = state.onboarding;
   const disableFocusToggle = state.onboarding;
@@ -238,6 +239,7 @@ function resolveSessionOptions(
   sessionKey: string,
   sessions: SessionsListResult | null,
   mainSessionKey?: string | null,
+  agentsList?: AgentsListResult | null,
 ) {
   const seen = new Set<string>();
   const options: Array<{ key: string; displayName?: string }> = [];
@@ -271,6 +273,23 @@ function resolveSessionOptions(
         options.push({
           key: s.key,
           displayName: resolveSessionDisplayName(s.key, s),
+        });
+      }
+    }
+  }
+
+  // Ensure all configured agents are always visible in the dropdown,
+  // even when their sessions are stale / filtered out by activeMinutes.
+  if (agentsList?.agents) {
+    const mainKey = agentsList.mainKey || "main";
+    for (const agent of agentsList.agents) {
+      const agentSessionKey = `agent:${agent.id}:${mainKey}`;
+      if (!seen.has(agentSessionKey)) {
+        seen.add(agentSessionKey);
+        const name = agent.identity?.name || agent.name || agent.id;
+        options.push({
+          key: agentSessionKey,
+          displayName: `${name} (${agentSessionKey})`,
         });
       }
     }
